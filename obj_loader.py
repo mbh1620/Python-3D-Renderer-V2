@@ -41,6 +41,7 @@ class OBJ_loader:
 						face.append(subsections[0])
 				if len(face) == 4:
 						#Create two triangles
+
 					triangle1 = (int(face[0])-1, int(face[1])-1, int(face[2])-1, (255, 0, 0))
 					triangle2 = (int(face[2])-1, int(face[3])-1, int(face[0])-1, (225, 0, 0))
 
@@ -57,6 +58,10 @@ class OBJ_loader:
 				pass
 
 		f.close()
+
+	def average_vertex_normals(self, vertex_normals):
+		pass
+
 
 	def process_material(self):
 		pass

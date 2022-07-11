@@ -105,21 +105,56 @@ class ProjectionViewer:
 				pass
 			if self.displayEdges:
 				for n1, n2 in wireframe.edges:
-					if wireframe.perspective_nodes[n1][2] > 0 and wireframe.perspective_nodes[n2][2] > 0 and wireframe.perspective_nodes[n1][2] < 10000 and wireframe.perspective_nodes[n1][0] > 0 and wireframe.perspective_nodes[n1][0] < 1199 :
-						pygame.draw.aaline(self.screen, self.edgeColour, wireframe.perspective_nodes[n1][:2], wireframe.perspective_nodes[n2][:2], 1)
+					clipN1 = self.clipNode(wireframe.perspective_nodes[n1])
+					clipN2 = self.clipNode(wireframe.perspective_nodes[n2])
+					if type(clipN1) == int or type(clipN2) == int:
+						pass
+					else:
+						pygame.draw.aaline(self.screen, self.edgeColour, clipN1[:2], clipN2[:2], 1)
 
 			else:
 				pass
 			if self.displayFaces:
 				for n1,n2,n3,c in wireframe.faces:
-					if wireframe.perspective_nodes[n1][2] > 0 and wireframe.perspective_nodes[n2][2] > 0 and wireframe.perspective_nodes[n1][2] < 10000:
-						pygame.draw.polygon(self.screen, c, [wireframe.perspective_nodes[n1][:2], wireframe.perspective_nodes[n2][:2], wireframe.perspective_nodes[n3][:2]], 0)
+					clipN1 = self.clipNode(wireframe.perspective_nodes[n1]) 
+					clipN2 = self.clipNode(wireframe.perspective_nodes[n2])
+					clipN3 = self.clipNode(wireframe.perspective_nodes[n3])
+					if type(clipN1) == int or type(clipN2) == int or type(clipN3) == int:
+						pass
+					else:
+						pygame.draw.polygon(self.screen, c, [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
 
 			else:
 				pass
 
 	def processLighting(self):
 		pass
+
+	def clipNode(self, node):
+		#Clip all of the faces, vertices and edges that are not in the clipping box
+		x = self.width
+		y = self.height
+		z = 10000
+		clippedNode = 0
+
+		#Sort x positions
+		
+		if node[0] > x or node[0] < 0:
+			return 0
+
+		if node[1] > y or node[0] < 0: 
+			return 0
+
+		if node[2] < z and node[2] > 0:
+			clippedNode = node
+		else:
+			return 0
+
+
+		return clippedNode
+
+
+
 
 	def translateAll(self, vector):
 		''' Translate all wireframes along a given axis by d units '''

@@ -8,6 +8,7 @@ from building_generator import *
 
 load_deer= OBJ_loader('./Assets/deer.obj', 100)
 load_cube= OBJ_loader('./Assets/untitled.obj', 100)
+
 cube = load_cube.create_wireframe()
 deer = load_deer.create_wireframe()
 	
