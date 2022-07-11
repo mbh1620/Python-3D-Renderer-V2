@@ -6,15 +6,15 @@ import random
 from mesh_floor import *
 from building_generator import *
 
-load_deer= OBJ_loader('./Assets/deer.obj', 100)
-load_cube= OBJ_loader('./Assets/untitled.obj', 100)
+load_deer= OBJ_loader('./Assets/test.obj', 100)
+# load_cube= OBJ_loader('./Assets/untitled.obj', 100)
 
-cube = load_cube.create_wireframe()
+# cube = load_cube.create_wireframe()
 deer = load_deer.create_wireframe()
 	
-pv = ProjectionViewer(1200, 1000, cube)
+pv = ProjectionViewer(1200, 1000, deer)
 	
-pv.addWireframe('cube', cube)
+# pv.addWireframe('cube', cube)
 pv.addWireframe('deer', deer)
 
 pv.run()

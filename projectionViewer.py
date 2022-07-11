@@ -12,7 +12,7 @@ class ProjectionViewer:
 		self.width = width
 		self.height = height
 		self.screen = pygame.display.set_mode((width, height))
-		pygame.display.set_caption('Wireframe Display')
+		pygame.display.set_caption('3D Renderer')
 		self.background = (10,10,50)
 
 		#Setup camera
@@ -119,10 +119,16 @@ class ProjectionViewer:
 					clipN1 = self.clipNode(wireframe.perspective_nodes[n1]) 
 					clipN2 = self.clipNode(wireframe.perspective_nodes[n2])
 					clipN3 = self.clipNode(wireframe.perspective_nodes[n3])
+
 					if type(clipN1) == int or type(clipN2) == int or type(clipN3) == int:
 						pass
 					else:
-						pygame.draw.polygon(self.screen, c, [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
+
+						cull = self.backFaceCull(clipN1, clipN2, clipN3)
+						if cull:
+							pass
+						else:
+							pygame.draw.polygon(self.screen, c, [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
 
 			else:
 				pass
@@ -130,11 +136,21 @@ class ProjectionViewer:
 	def processLighting(self):
 		pass
 
+	def backFaceCull(self, n1, n2, n3):
+		#We need the x and y position of each node
+
+		answer = ((n1[0] * n2[1]) + (n2[0]* n3[1]) + (n3[0] * n1[1])) - ((n3[0] * n2[1]) + (n2[0] * n1[1]) + (n1[0] * n3[1]))
+
+		if answer > 0:
+			return True
+		else:
+			return False
+
 	def clipNode(self, node):
 		#Clip all of the faces, vertices and edges that are not in the clipping box
 		x = self.width
 		y = self.height
-		z = 10000
+		z = 2000
 		clippedNode = 0
 
 		#Sort x positions
@@ -150,11 +166,7 @@ class ProjectionViewer:
 		else:
 			return 0
 
-
 		return clippedNode
-
-
-
 
 	def translateAll(self, vector):
 		''' Translate all wireframes along a given axis by d units '''
