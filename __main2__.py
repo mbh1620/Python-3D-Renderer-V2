@@ -10,7 +10,7 @@ from Classes.Light import Light
 
 files = os.scandir('./Assets/')
 
-load_deer= OBJ_loader('./Assets/cone.obj', 50)
+load_deer= OBJ_loader('./Assets/smallCity.obj', 50)
 
 deer = load_deer.create_wireframe()
 
@@ -18,7 +18,7 @@ pv = ProjectionViewer(1200, 1000, deer)
 	
 pv.addWireframe('deer', deer)
 
-light1 = Light((-1000, -100, 0), 1)
+light1 = Light((-1000, -10000, 0), 1)
 
 pv.addLight('Light1', light1)
 
