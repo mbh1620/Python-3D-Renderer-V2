@@ -9,6 +9,7 @@ class Wireframe:
 		self.perspective_nodes = None
 		self.edges = []
 		self.faces = []
+		self.materials = {}
 
 	def addNodes(self, node_array):
 
@@ -22,13 +23,16 @@ class Wireframe:
 	def addEdges(self, edgeList):
 		self.edges += edgeList
 
+	def addMaterial(self, materialDictionary):
+		self.materials = materialDictionary
+
 	def sortFaces(self):
 		#Sort faces makes sure that the front most face is painted first stopping any 
 		self.faces.sort(key=self.sortKey, reverse=True)
 		
 
 	def sortKey(self, inputs):
-		return (self.perspective_nodes[inputs[0]][2] + self.perspective_nodes[inputs[1]][2] + self.perspective_nodes[inputs[2]][2])/ 3.0
+		return (self.perspective_nodes[inputs.vertices[0]][2] + self.perspective_nodes[inputs.vertices[1]][2] + self.perspective_nodes[inputs.vertices[2]][2])/ 3.0
 
 
 	def outputNodes(self):

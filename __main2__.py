@@ -5,16 +5,21 @@ from obj_loader import OBJ_loader
 import random
 from mesh_floor import *
 from building_generator import *
+import os
+from Classes.Light import Light
 
-load_deer= OBJ_loader('./Assets/test.obj', 100)
-# load_cube= OBJ_loader('./Assets/untitled.obj', 100)
+files = os.scandir('./Assets/')
 
-# cube = load_cube.create_wireframe()
+load_deer= OBJ_loader('./Assets/cone.obj', 50)
+
 deer = load_deer.create_wireframe()
-	
+
 pv = ProjectionViewer(1200, 1000, deer)
 	
-# pv.addWireframe('cube', cube)
 pv.addWireframe('deer', deer)
+
+light1 = Light((-1000, -100, 0), 1)
+
+pv.addLight('Light1', light1)
 
 pv.run()

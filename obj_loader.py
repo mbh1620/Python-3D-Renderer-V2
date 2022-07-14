@@ -1,6 +1,9 @@
 #OBJ file loader class
 import wireframe
 import numpy as np
+from Classes.Face import Face
+import math
+
 
 class OBJ_loader:
 
@@ -12,12 +15,20 @@ class OBJ_loader:
 		self.nodeArray = []
 		self.faceArray = []
 		self.edgeArray = []
+		self.vertexNormalArray = []
+		self.materialDictionary = {}
 
+		self.process_material_file()
 		self.process_file()
 
 	def process_file(self):
 
 		f = open(self.filename, "r")
+
+		if len(self.materialDictionary.keys()) == 0:
+			self.materialDictionary['default'] = (255,0,0)
+
+		material = ''
 
 		for i in f:
 
@@ -25,46 +36,87 @@ class OBJ_loader:
 				pass
 
 			elif i[0] == 'v' and i[1] == 'n':
-				pass
+				i = i.split()
+				self.vertexNormalArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
 
 			elif i[0] == 'v' and i[1] == ' ':
 				i = i.split()
-				self.nodeArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), float(i[3])*self.scaleFactor])
+				self.nodeArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
+
+			elif i.find('usemtl') != -1:
+				i = i.split(' ')
+				material = i[1]
 
 			elif i[0] == 'f':
 
 				i = i.split()
 				face = []
+				faceVertexNormals = []
 				for subsection in i:
 					subsections = subsection.split('/')
 					if subsections[0] != 'f':
 						face.append(subsections[0])
+						faceVertexNormals.append(subsections[2])
 				if len(face) == 4:
 						#Create two triangles
-					triangle1 = (int(face[0])-1, int(face[1])-1, int(face[2])-1, (255, 0, 0))
-					triangle2 = (int(face[2])-1, int(face[3])-1, int(face[0])-1, (225, 0, 0))
+					triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
+					triangle2 = Face((int(face[2])-1, int(face[3])-1, int(face[0])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[2])-1], self.vertexNormalArray[int(faceVertexNormals[3])-1], self.vertexNormalArray[int(faceVertexNormals[0])-1]), self.materialDictionary[material])
 
 					self.faceArray.append(triangle1)
 					self.faceArray.append(triangle2)
 				elif len(face) == 3:
 						#Create one triangle
-					triangle1 = (int(face[0])-1, int(face[1])-1, int(face[2])-1, (255,0,0))
+					triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
 					self.faceArray.append(triangle1)
 
 				else:
-					# print('length of face not valid')
 					pass
+
+			elif i[0] == 'm':
+				#use material to add the colour to the face
+				pass
 			else:
 				pass
 
 		f.close()
 
-	def average_vertex_normals(self, vertex_normals):
-		pass
+	def getFaceNormal(self, vertexNormalA, vertexNormalB, vertexNormalC):
+
+		averagedVertexNormal = [None, None, None]
+
+		averagedVertexNormal[0] = (vertexNormalA[0] + vertexNormalB[0] + vertexNormalC[0])/3.0
+		averagedVertexNormal[1] = (vertexNormalA[1] + vertexNormalB[1] + vertexNormalC[1])/3.0
+		averagedVertexNormal[2] = (vertexNormalA[2] + vertexNormalB[2] + vertexNormalC[2])/3.0
+
+		averagedVertexNormal[0] = averagedVertexNormal[0] / math.sqrt((averagedVertexNormal[0]**2) + (averagedVertexNormal[1]**2) + (averagedVertexNormal[2]**2))
+		averagedVertexNormal[1] = averagedVertexNormal[1] / math.sqrt((averagedVertexNormal[0]**2) + (averagedVertexNormal[1]**2) + (averagedVertexNormal[2]**2))
+		averagedVertexNormal[2] = averagedVertexNormal[2] / math.sqrt((averagedVertexNormal[0]**2) + (averagedVertexNormal[1]**2) + (averagedVertexNormal[2]**2))
+
+		return averagedVertexNormal
 
 
-	def process_material(self):
-		pass
+	def process_material_file(self):
+		#open the same filename with the .mtl file extension
+		filename = self.filename.rsplit(".", 1)
+		filename = filename[0] + ".mtl"
+
+		materialName = ''
+
+		f = open(filename, 'r')
+		
+		for i in f:
+			if i.find('newmtl') == 0:
+				i = i.split(' ')
+				materialName = i[-1]
+
+			if i[0] == 'K' and i[1] == 'd':
+				i = i.split(' ')
+				r = float(i[1])*255
+				g = float(i[2])*255
+				b = float(i[3])*255
+
+				self.materialDictionary[materialName] = (r,g,b)
+				
 
 	def create_wireframe(self):
 
@@ -74,5 +126,7 @@ class OBJ_loader:
 		
 		for i in self.faceArray:
 			Object.addFaces([i])
+
+		Object.addMaterial(self.materialDictionary)
 
 		return Object

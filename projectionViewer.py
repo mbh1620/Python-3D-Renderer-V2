@@ -90,6 +90,9 @@ class ProjectionViewer:
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
 
+	def addLight(self, name, light):
+		self.lights[name] = light
+
 	def display(self):
 
 		self.screen.fill(self.background)
@@ -115,7 +118,8 @@ class ProjectionViewer:
 			else:
 				pass
 			if self.displayFaces:
-				for n1,n2,n3,c in wireframe.faces:
+				for face in wireframe.faces:
+					n1, n2, n3 = face.vertices
 					clipN1 = self.clipNode(wireframe.perspective_nodes[n1]) 
 					clipN2 = self.clipNode(wireframe.perspective_nodes[n2])
 					clipN3 = self.clipNode(wireframe.perspective_nodes[n3])
@@ -128,13 +132,31 @@ class ProjectionViewer:
 						if cull:
 							pass
 						else:
-							pygame.draw.polygon(self.screen, c, [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
-
+							pygame.draw.polygon(self.screen, [self.processLighting(face) * x for x in face.material], [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
 			else:
 				pass
 
-	def processLighting(self):
-		pass
+	def processLighting(self, face):
+
+		#Work out the dot product of the (face normal, and the unit vector from the face to the light)
+
+		directionVector = [None, None, None]
+
+		for light in self.lights.values():
+			directionVector[0] = (face.fNormal[0] - light.position[0])  
+			directionVector[1] = (face.fNormal[1] - light.position[1])  
+			directionVector[2] = (face.fNormal[2] - light.position[2])  
+
+			directionVector[0] = directionVector[0] / math.sqrt((directionVector[0]**2) + (directionVector[1]**2) + (directionVector[2]**2))
+			directionVector[1] = directionVector[1] / math.sqrt((directionVector[0]**2) + (directionVector[1]**2) + (directionVector[2]**2))
+			directionVector[2] = directionVector[2] / math.sqrt((directionVector[0]**2) + (directionVector[1]**2) + (directionVector[2]**2))
+
+		cosTheta = self.clamp((directionVector[0]*face.fNormal[0]) + (directionVector[1]*face.fNormal[1]) + (directionVector[2]*face.fNormal[2]), 0, 1)
+
+		return abs(cosTheta)
+		
+	def clamp(self, num, min_value, max_value):
+		return max(min(num, max_value), min_value)
 
 	def backFaceCull(self, n1, n2, n3):
 		#We need the x and y position of each node
