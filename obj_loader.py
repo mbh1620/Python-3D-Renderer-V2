@@ -94,7 +94,6 @@ class OBJ_loader:
 
 		return averagedVertexNormal
 
-
 	def process_material_file(self):
 		#open the same filename with the .mtl file extension
 		filename = self.filename.rsplit(".", 1)
@@ -117,7 +116,6 @@ class OBJ_loader:
 
 				self.materialDictionary[materialName] = (r,g,b)
 				
-
 	def create_wireframe(self):
 
 		Object = wireframe.Wireframe()

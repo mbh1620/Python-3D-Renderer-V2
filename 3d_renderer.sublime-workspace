@@ -541,7 +541,7 @@
 			"file": "obj_loader.py",
 			"settings":
 			{
-				"buffer_size": 4180,
+				"buffer_size": 4178,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -550,7 +550,7 @@
 			"file": "__main2__.py",
 			"settings":
 			{
-				"buffer_size": 499,
+				"buffer_size": 501,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -586,7 +586,7 @@
 			"file": "README.md",
 			"settings":
 			{
-				"buffer_size": 242,
+				"buffer_size": 338,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -874,7 +874,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -890,8 +890,8 @@
 						"selection":
 						[
 							[
-								4834,
-								4834
+								550,
+								550
 							]
 						],
 						"settings":
@@ -900,10 +900,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2838.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -941,15 +941,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4180,
+						"buffer_size": 4178,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								100,
-								100
+								3951,
+								3951
 							]
 						],
 						"settings":
@@ -958,7 +958,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 973.0,
+						"translation.y": 1376.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -970,15 +970,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 499,
+						"buffer_size": 501,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								450,
-								450
+								455,
+								455
 							]
 						],
 						"settings":
@@ -990,7 +990,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -1049,7 +1049,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -1077,7 +1077,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
@@ -1086,15 +1086,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 242,
+						"buffer_size": 338,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								239,
-								239
+								317,
+								317
 							]
 						],
 						"settings":

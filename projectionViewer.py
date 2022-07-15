@@ -23,11 +23,11 @@ class ProjectionViewer:
 		self.lights = {}
 
 		self.displayNodes = False
-		self.displayEdges = True
+		self.displayEdges = False
 		self.displayFaces = True
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
-		self.nodeRadius = 4
+		self.nodeRadius = 2
 
 	def run(self):
 
@@ -93,6 +93,12 @@ class ProjectionViewer:
 	def addLight(self, name, light):
 		self.lights[name] = light
 
+		lightWireframe = Wireframe()
+		lightPosition = np.array([[light.position[0], light.position[1], light.position[2]]])
+		lightWireframe.addNodes(lightPosition)
+
+		self.wireframes['name'] = lightWireframe
+
 	def display(self):
 
 		self.screen.fill(self.background)
@@ -143,17 +149,21 @@ class ProjectionViewer:
 		directionVector = [None, None, None]
 
 		for light in self.lights.values():
-			directionVector[0] = (face.fNormal[0] - light.position[0])  
-			directionVector[1] = (face.fNormal[1] - light.position[1])  
-			directionVector[2] = (face.fNormal[2] - light.position[2])  
+			directionVector[0] = ( light.position[0] - face.fNormal[0])  
+			directionVector[1] = ( light.position[1] - face.fNormal[1])  
+			directionVector[2] = ( light.position[2] - face.fNormal[2])
 
-			directionVector[0] = directionVector[0] / math.sqrt((directionVector[0]**2) + (directionVector[1]**2) + (directionVector[2]**2))
-			directionVector[1] = directionVector[1] / math.sqrt((directionVector[0]**2) + (directionVector[1]**2) + (directionVector[2]**2))
-			directionVector[2] = directionVector[2] / math.sqrt((directionVector[0]**2) + (directionVector[1]**2) + (directionVector[2]**2))
+			olddirectionVectorX = directionVector[0]
+			olddirectionVectorY = directionVector[1]
+			olddirectionVectorZ = directionVector[2]
+
+			directionVector[0] = directionVector[0] / math.sqrt((olddirectionVectorX**2) + (olddirectionVectorY**2) + (olddirectionVectorZ**2))
+			directionVector[1] = directionVector[1] / math.sqrt((olddirectionVectorX**2) + (olddirectionVectorY**2) + (olddirectionVectorZ**2))
+			directionVector[2] = directionVector[2] / math.sqrt((olddirectionVectorX**2) + (olddirectionVectorY**2) + (olddirectionVectorZ**2))
 
 		cosTheta = self.clamp((directionVector[0]*face.fNormal[0]) + (directionVector[1]*face.fNormal[1]) + (directionVector[2]*face.fNormal[2]), 0, 1)
 
-		return abs(cosTheta)
+		return cosTheta
 		
 	def clamp(self, num, min_value, max_value):
 		return max(min(num, max_value), min_value)
