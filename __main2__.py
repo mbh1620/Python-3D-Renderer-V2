@@ -8,17 +8,22 @@ from building_generator import *
 import os
 from Classes.Light import Light
 
-files = os.scandir('./Assets/')
+import tkinter as tk
 
-load_deer= OBJ_loader('./Assets/ball.obj', 50)
+from tkinter import filedialog
 
-deer = load_deer.create_wireframe()
+root = tk.Tk()
+root.withdraw()
 
-pv = ProjectionViewer(1200, 1000, deer)
+load_ball_1= OBJ_loader('./Assets/sphere.obj' , 50)
+
+ball1 = load_ball_1.create_wireframe()
+
+pv = ProjectionViewer(1200, 1000, ball1)
 	
-pv.addWireframe('deer', deer)
+pv.addWireframe('ball1', ball1)
 
-light1 = Light((-10000, 0, -1000), 1)
+light1 = Light((500, 200, -100), 1)
 
 pv.addLight('Light1', light1)
 

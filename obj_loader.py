@@ -7,7 +7,11 @@ import math
 
 class OBJ_loader:
 
-	def __init__(self, filename, scaleFactor):
+	def __init__(self, filename, scaleFactor, offset=[0,0,0]):
+		self.x_offset = offset[0]
+		self.y_offset = offset[1]
+		self.z_offset = offset[2]
+
 		self.filename = filename
 		self.scaleFactor = scaleFactor
 
@@ -88,9 +92,13 @@ class OBJ_loader:
 		averagedVertexNormal[1] = (vertexNormalA[1] + vertexNormalB[1] + vertexNormalC[1])/3.0
 		averagedVertexNormal[2] = (vertexNormalA[2] + vertexNormalB[2] + vertexNormalC[2])/3.0
 
-		averagedVertexNormal[0] = averagedVertexNormal[0] / math.sqrt((averagedVertexNormal[0]**2) + (averagedVertexNormal[1]**2) + (averagedVertexNormal[2]**2))
-		averagedVertexNormal[1] = averagedVertexNormal[1] / math.sqrt((averagedVertexNormal[0]**2) + (averagedVertexNormal[1]**2) + (averagedVertexNormal[2]**2))
-		averagedVertexNormal[2] = averagedVertexNormal[2] / math.sqrt((averagedVertexNormal[0]**2) + (averagedVertexNormal[1]**2) + (averagedVertexNormal[2]**2))
+		vectorNormalX = averagedVertexNormal[0]
+		vectorNormalY = averagedVertexNormal[1]
+		vectorNormalZ = averagedVertexNormal[2]
+
+		averagedVertexNormal[0] = averagedVertexNormal[0] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
+		averagedVertexNormal[1] = averagedVertexNormal[1] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
+		averagedVertexNormal[2] = averagedVertexNormal[2] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
 
 		return averagedVertexNormal
 

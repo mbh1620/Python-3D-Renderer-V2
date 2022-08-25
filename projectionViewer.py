@@ -3,6 +3,10 @@ import pygame
 import numpy as np
 from camera import *
 import time
+from Classes.Toolbar import Toolbar
+from obj_loader import OBJ_loader
+import tkinter as tk
+from tkinter import filedialog
 
 class ProjectionViewer:
 
@@ -29,6 +33,10 @@ class ProjectionViewer:
 		self.edgeColour = (200,200,200)
 		self.nodeRadius = 2
 
+		self.toolbar = Toolbar(self.screen, self.width)
+
+		pygame.init()
+
 	def run(self):
 
 		key_to_function = {
@@ -54,6 +62,9 @@ class ProjectionViewer:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					running = False
+
+				elif event.type == pygame.MOUSEBUTTONUP:
+					self.toolbar.process_click(pygame.mouse.get_pos())
 				
 			if keys[pygame.K_LEFT]:
 				key_to_function[pygame.K_LEFT](self)
@@ -73,6 +84,12 @@ class ProjectionViewer:
 				key_to_function[pygame.K_d](self)
 
 			self.display()
+			self.toolbar.render()
+
+			if self.toolbar.open_flag == True:
+				self.open_file()
+				self.toolbar.open_flag = False
+
 			pygame.display.flip()
 
 	def addWireframe(self, name, wireframe):
@@ -97,7 +114,7 @@ class ProjectionViewer:
 		lightPosition = np.array([[light.position[0], light.position[1], light.position[2]]])
 		lightWireframe.addNodes(lightPosition)
 
-		self.wireframes['name'] = lightWireframe
+		self.wireframes[name] = lightWireframe
 
 	def display(self):
 
@@ -144,8 +161,6 @@ class ProjectionViewer:
 
 	def processLighting(self, face):
 
-		#Work out the dot product of the (face normal, and the unit vector from the face to the light)
-
 		directionVector = [None, None, None]
 
 		for light in self.lights.values():
@@ -169,7 +184,6 @@ class ProjectionViewer:
 		return max(min(num, max_value), min_value)
 
 	def backFaceCull(self, n1, n2, n3):
-		#We need the x and y position of each node
 
 		answer = ((n1[0] * n2[1]) + (n2[0]* n3[1]) + (n3[0] * n1[1])) - ((n3[0] * n2[1]) + (n2[0] * n1[1]) + (n1[0] * n3[1]))
 
@@ -179,13 +193,11 @@ class ProjectionViewer:
 			return False
 
 	def clipNode(self, node):
-		#Clip all of the faces, vertices and edges that are not in the clipping box
+
 		x = self.width
 		y = self.height
 		z = 2000
 		clippedNode = 0
-
-		#Sort x positions
 		
 		if node[0] > x or node[0] < 0:
 			return 0
@@ -352,6 +364,22 @@ class ProjectionViewer:
 			self.displayNodes = False
 		else:
 			self.displayNodes = True
+
+
+	def open_file(self):
+
+		root = tk.Tk()
+		root.withdraw()
+
+		file_path = filedialog.askopenfilename()
+
+		model= OBJ_loader(file_path, 50)
+
+		model_wf = model.create_wireframe()
+
+		self.addWireframe('model_'+str(len(self.wireframes)), model_wf)
+
+
 		
 					
 
