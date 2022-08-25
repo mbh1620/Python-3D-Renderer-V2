@@ -38,21 +38,64 @@ class Toolbar:
 		textRect.center = (60, 50)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Add Light', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (60, 75)
+		self.screen.blit(text, textRect)
+
 	def edit(self):
-		pass
+		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(60,30,200, 250))
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Hello', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (100, 50)
+		self.screen.blit(text, textRect)
 
 	def view(self):
-		pass
+		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(120,30,200, 250))
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'View Models', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 50)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Floor Grid √', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 70)
+		self.screen.blit(text, textRect)
 
 	def process_click(self, cursor_position):
 		x, y = cursor_position
-		print(x, y)
+		# print(x, y)
 		#File
 		if 0 < x and x < 60 and 0 < y and y < 30:
 			if self.file_flag == False:
 				self.file_flag = True
+				self.edit_flag = False
+				self.view_flag = False
 			else:
 				self.file_flag = False
+
+		elif 60 < x and x < 120 and 0 < y and y < 30:
+			if self.edit_flag == False:
+				self.edit_flag = True
+				self.file_flag = False
+				self.view_flag = False
+			else:
+				self.edit_flag = False
+
+		elif 120 < x and x < 180 and 0 < y and y < 30:
+			if self.view_flag == False:
+				self.edit_flag = False
+				self.file_flag = False
+				self.view_flag = True
+			else:
+				self.view_flag = False
+
 
 		if self.file_flag:
 			if 0 < x and x < 120 and 30 < y and y < 70:

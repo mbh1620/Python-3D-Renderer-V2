@@ -89,6 +89,7 @@ class ProjectionViewer:
 			if self.toolbar.open_flag == True:
 				self.open_file()
 				self.toolbar.open_flag = False
+			
 
 			pygame.display.flip()
 
