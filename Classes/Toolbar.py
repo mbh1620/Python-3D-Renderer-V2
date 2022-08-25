@@ -12,6 +12,8 @@ class Toolbar:
 		self.view_flag = False
 
 		self.open_flag = False
+		self.view_model_flag = False
+		self.grid_flag = False
 
 	def render(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(0,0,self.width, 30))
@@ -96,16 +98,33 @@ class Toolbar:
 			else:
 				self.view_flag = False
 
-
 		if self.file_flag:
 			if 0 < x and x < 120 and 30 < y and y < 70:
 				self.open()
 
+		if self.edit_flag:
+			if 0 < x and x < 120 and 30 < y and y < 70:
+				pass
+
+		if self.view_flag:
+			if 120 < x and x < 350 and 30 < y and y < 60:
+				self.view_model()
+			elif 120 < x and x < 350 and 60 < y and y < 100:
+				self.toggle_grid()
+				
+
+	def view_model(self):
+		self.view_model_flag = True
+		self.view_flag = False
 
 	def open(self):
 
 		self.open_flag = True
 		self.file_flag = False
+
+	def toggle_grid(self):
+
+		self.grid_flag = True
 
 		
 

@@ -19,6 +19,9 @@ class ProjectionViewer:
 		pygame.display.set_caption('3D Renderer')
 		self.background = (10,10,50)
 
+		self.root = None
+		self.root_flag = False
+
 		#Setup camera
 		self.camera = Camera([0,0,0],0,0)
 		self.center_point = center_point
@@ -27,7 +30,7 @@ class ProjectionViewer:
 		self.lights = {}
 
 		self.displayNodes = False
-		self.displayEdges = False
+		self.displayEdges = True
 		self.displayFaces = True
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
@@ -89,7 +92,19 @@ class ProjectionViewer:
 			if self.toolbar.open_flag == True:
 				self.open_file()
 				self.toolbar.open_flag = False
-			
+			if self.toolbar.view_model_flag:
+				self.toolbar.view_model_flag = False
+				self.view_model_window()
+
+			if self.toolbar.grid_flag == True:
+				
+				if self.wireframes['grid'].showEdges == False:
+					self.wireframes['grid'].showEdges = True
+				else:
+					self.wireframes['grid'].showEdges = False
+
+				self.toolbar.grid_flag = False
+				
 
 			pygame.display.flip()
 
@@ -130,7 +145,7 @@ class ProjectionViewer:
 						pygame.draw.circle(self.screen, self.nodeColour, (int(node[0]), int(node[1])), self.nodeRadius, 0)
 			else:
 				pass
-			if self.displayEdges:
+			if self.displayEdges and wireframe.showEdges:
 				for n1, n2 in wireframe.edges:
 					clipN1 = self.clipNode(wireframe.perspective_nodes[n1])
 					clipN2 = self.clipNode(wireframe.perspective_nodes[n2])
@@ -141,7 +156,7 @@ class ProjectionViewer:
 
 			else:
 				pass
-			if self.displayFaces:
+			if self.displayFaces and wireframe.showFaces:
 				for face in wireframe.faces:
 					n1, n2, n3 = face.vertices
 					clipN1 = self.clipNode(wireframe.perspective_nodes[n1]) 
@@ -367,18 +382,75 @@ class ProjectionViewer:
 			self.displayNodes = True
 
 
-	def open_file(self):
+	def open_file(self, filename=None, showWireframeFaces=True, showWireframeEdges=False):
 
-		root = tk.Tk()
-		root.withdraw()
+		if filename == None:
+			self.root = tk.Tk()
+		
+			self.root.withdraw()
 
-		file_path = filedialog.askopenfilename()
+			file_path = filedialog.askopenfilename()
+
+		else:
+			file_path = filename
 
 		model= OBJ_loader(file_path, 50)
 
 		model_wf = model.create_wireframe()
 
-		self.addWireframe('model_'+str(len(self.wireframes)), model_wf)
+		model_wf.showFaces = showWireframeFaces
+		model_wf.showEdges = showWireframeEdges
+
+		self.addWireframe(str(file_path.split("/")[-1])+str(len(self.wireframes)), model_wf)
+
+
+	def view_model_window(self):
+
+		self.root = tk.Tk()
+		
+		self.root.geometry('500x300')
+		self.root.resizable(False, False)
+		self.root.title('Current Models')
+
+		self.root_flag = True
+
+		self.root.columnconfigure(0, weight=1)
+		self.root.rowconfigure(0, weight=1)
+
+		listbox = tk.Listbox(
+			self.root,
+			height=6,
+			selectmode='extended')
+
+		listbox.grid(
+			column=0,
+			row=0,
+			sticky='nwes')
+
+		num = 0 
+		for i in self.wireframes.keys():
+			listbox.insert(num, i)
+			num += 1
+
+		# self.toolbar.view_model_flag == False
+
+		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+		
+		while self.root_flag == True:
+			self.root.update()
+
+		self.root.destroy()
+
+	def on_closing(self):
+	
+		self.root_flag = False
+		
+
+
+		
+
+
+
 
 
 		

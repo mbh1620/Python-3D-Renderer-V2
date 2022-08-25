@@ -11,6 +11,9 @@ class Wireframe:
 		self.faces = []
 		self.materials = {}
 
+		self.showEdges = True
+		self.showFaces = True
+
 	def addNodes(self, node_array):
 
 		ones_column = np.ones((len(node_array), 1))

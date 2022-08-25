@@ -66,11 +66,21 @@ class OBJ_loader:
 					triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
 					triangle2 = Face((int(face[2])-1, int(face[3])-1, int(face[0])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[2])-1], self.vertexNormalArray[int(faceVertexNormals[3])-1], self.vertexNormalArray[int(faceVertexNormals[0])-1]), self.materialDictionary[material])
 
+					self.edgeArray.append((int(face[0])-1, int(face[1])-1))
+					self.edgeArray.append((int(face[1])-1, int(face[2])-1))
+					self.edgeArray.append((int(face[2])-1, int(face[0])-1))
+					self.edgeArray.append((int(face[2])-1, int(face[3])-1))
+					self.edgeArray.append((int(face[3])-1, int(face[0])-1))
+					self.edgeArray.append((int(face[0])-1, int(face[2])-1))
+
 					self.faceArray.append(triangle1)
 					self.faceArray.append(triangle2)
 				elif len(face) == 3:
 						#Create one triangle
 					triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
+					self.edgeArray.append((int(face[0])-1, int(face[1])-1))
+					self.edgeArray.append((int(face[1])-1, int(face[2])-1))
+					self.edgeArray.append((int(face[2])-1, int(face[0])-1))
 					self.faceArray.append(triangle1)
 
 				else:
@@ -129,6 +139,7 @@ class OBJ_loader:
 		Object = wireframe.Wireframe()
 
 		Object.addNodes(np.array(self.nodeArray))
+		Object.addEdges(self.edgeArray)
 		
 		for i in self.faceArray:
 			Object.addFaces([i])
