@@ -13,6 +13,8 @@ class Toolbar:
 
 		self.open_flag = False
 		self.view_model_flag = False
+		self.measure_tool_flag = False
+		self.draw_rectangle_flag = False
 		self.grid_flag = False
 
 	def render(self):
@@ -70,6 +72,18 @@ class Toolbar:
 		textRect.center = (200, 70)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Measure Tool', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 90)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Draw Rectangle Tool', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 110)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
@@ -109,8 +123,12 @@ class Toolbar:
 		if self.view_flag:
 			if 120 < x and x < 350 and 30 < y and y < 60:
 				self.view_model()
-			elif 120 < x and x < 350 and 60 < y and y < 100:
+			elif 120 < x and x < 350 and 60 < y and y < 80:
 				self.toggle_grid()
+			elif 120 < x and x < 350 and 80 < y and y < 100:
+				self.toggle_measure_tool()
+			elif 120 < x and x < 350 and 100 < y and y < 120:
+				self.toggle_rectangle_tool()
 				
 
 	def view_model(self):
@@ -125,6 +143,14 @@ class Toolbar:
 	def toggle_grid(self):
 
 		self.grid_flag = True
+
+	def toggle_measure_tool(self):
+
+		self.measure_tool_flag = True
+
+	def toggle_rectangle_tool(self):
+		self.draw_rectangle_flag = True
+		#Tool for drawing a rectangle
 
 		
 

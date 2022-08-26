@@ -3,7 +3,6 @@ import wireframe
 import numpy as np
 from obj_loader import OBJ_loader
 import random
-from mesh_floor import *
 from building_generator import *
 import os
 from Classes.Light import Light

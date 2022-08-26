@@ -6,7 +6,9 @@ import time
 from Classes.Toolbar import Toolbar
 from obj_loader import OBJ_loader
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog
+from Classes.Face import Face
 
 class ProjectionViewer:
 
@@ -38,6 +40,9 @@ class ProjectionViewer:
 
 		self.toolbar = Toolbar(self.screen, self.width)
 
+		self.first_click = None
+		self.second_click = None
+
 		pygame.init()
 
 	def run(self):
@@ -67,7 +72,21 @@ class ProjectionViewer:
 					running = False
 
 				elif event.type == pygame.MOUSEBUTTONUP:
-					self.toolbar.process_click(pygame.mouse.get_pos())
+
+					if self.toolbar.draw_rectangle_flag == True:
+
+						if self.first_click == None:
+							self.first_click = pygame.mouse.get_pos()
+						else:
+							self.second_click = pygame.mouse.get_pos()
+							self.create_rectangle_wireframe(self.first_click,self.second_click)
+							self.first_click = None
+							self.second_click = None
+
+					else:
+						self.toolbar.process_click(pygame.mouse.get_pos())
+
+
 				
 			if keys[pygame.K_LEFT]:
 				key_to_function[pygame.K_LEFT](self)
@@ -89,23 +108,8 @@ class ProjectionViewer:
 			self.display()
 			self.toolbar.render()
 
-			if self.toolbar.open_flag == True:
-				self.open_file()
-				self.toolbar.open_flag = False
-			if self.toolbar.view_model_flag:
-				self.toolbar.view_model_flag = False
-				self.view_model_window()
-
-			if self.toolbar.grid_flag == True:
+			self.flag_detection()
 				
-				if self.wireframes['grid'].showEdges == False:
-					self.wireframes['grid'].showEdges = True
-				else:
-					self.wireframes['grid'].showEdges = False
-
-				self.toolbar.grid_flag = False
-				
-
 			pygame.display.flip()
 
 	def addWireframe(self, name, wireframe):
@@ -403,7 +407,6 @@ class ProjectionViewer:
 
 		self.addWireframe(str(file_path.split("/")[-1])+str(len(self.wireframes)), model_wf)
 
-
 	def view_model_window(self):
 
 		self.root = tk.Tk()
@@ -434,6 +437,12 @@ class ProjectionViewer:
 
 		# self.toolbar.view_model_flag == False
 
+		delete_button = ttk.Button(
+			self.root,
+			text="Delete",
+			command=self.delete_model()
+			)
+
 		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 		
 		while self.root_flag == True:
@@ -441,9 +450,60 @@ class ProjectionViewer:
 
 		self.root.destroy()
 
+	def delete_model(self):
+		pass
+
 	def on_closing(self):
 	
 		self.root_flag = False
+
+	def create_rectangle_wireframe(self, first_click, second_click):
+
+		#inverseKinematics to get the z position
+
+		rectangleWf = Wireframe()
+		first_click_x, first_click_y = first_click
+		second_click_x, second_click_y = second_click
+
+		nodes = np.array([[first_click_x, 0, first_click_y], [first_click_x, 0, second_click_y], [second_click_x, 0, second_click_y], [second_click_x, 0, first_click_y]])
+		rectangleWf.addNodes(nodes)
+
+		fNormal = [0,1,0]
+
+		rectangleWf.addEdges([(0,1),(1,2),(2,3),(3,0)])
+		face1 = Face((2,1,0),fNormal, (122,122,122))
+		face2 = Face((0,3,2),fNormal, material=(122,122,122))
+		rectangleWf.addFaces([face1])
+		rectangleWf.addFaces([face2])
+		
+		self.addWireframe('drawnRectangle', rectangleWf)
+
+
+
+
+	def flag_detection(self):
+		if self.toolbar.open_flag == True:
+			self.open_file()
+			self.toolbar.open_flag = False
+		if self.toolbar.view_model_flag:
+			self.toolbar.view_model_flag = False
+			self.view_model_window()
+
+		if self.toolbar.grid_flag == True:
+				
+			if self.wireframes['grid'].showEdges == False:
+				self.wireframes['grid'].showEdges = True
+			else:
+				self.wireframes['grid'].showEdges = False
+
+			self.toolbar.grid_flag = False
+
+		if self.toolbar.draw_rectangle_flag == True:
+			pass
+
+
+
+
 		
 
 
