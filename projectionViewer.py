@@ -36,7 +36,7 @@ class ProjectionViewer:
 		self.displayFaces = True
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
-		self.nodeRadius = 2
+		self.nodeRadius = 0
 
 		self.toolbar = Toolbar(self.screen, self.width)
 
@@ -89,8 +89,6 @@ class ProjectionViewer:
 
 					else:
 						self.toolbar.process_click(pygame.mouse.get_pos())
-
-			print(self.camera.pos)
 				
 			if keys[pygame.K_LEFT]:
 				key_to_function[pygame.K_LEFT](self)
@@ -226,7 +224,7 @@ class ProjectionViewer:
 		return clippedNode
 
 	def translateAll(self, vector):
-		''' Translate all wireframes along a given axis by d units '''
+
 		wf = Wireframe()
 		matrix = wf.translationMatrix(*vector)
 		for wireframe in self.wireframes.values():
@@ -251,12 +249,8 @@ class ProjectionViewer:
 
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
-			#wireframe.transform_for_perspective()
-
 
 	def rotate_about_Center(self, Axis, theta):
-
-		#First translate Centre of screen to 0,0
 
 		wf = Wireframe()
 		matrix = wf.translationMatrix(-self.width/2,-self.height/2,0)
@@ -264,7 +258,6 @@ class ProjectionViewer:
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
 
-		#Do Rotation
 		wf = Wireframe()
 		if Axis == 'X':
 			matrix = wf.rotateXMatrix(theta)
@@ -275,9 +268,6 @@ class ProjectionViewer:
 
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
-		
-
-		#Translate back to centre of screen
 
 		wf = Wireframe()
 		matrix = wf.translationMatrix(self.width/2,self.height/2,0)
@@ -306,15 +296,11 @@ class ProjectionViewer:
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
 		
-
-		#Translate back to original position
-
 		wf = Wireframe()
 		matrix = wf.translationMatrix(self.width/2,self.height/2,0)
 
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
-
 
 		self.camera.hor_angle += theta
 
@@ -323,21 +309,13 @@ class ProjectionViewer:
 		elif self.camera.hor_angle < -2*math.pi:
 			self.camera.hor_angle += 2*math.pi
 
-		self.camera.define_render_space()
-		# print(self.camera.pos)
-	
-
 	def scale_centre(self, vector):
-
-		#Transform center of screen to origin
 
 		wf = Wireframe()
 		matrix = wf.translationMatrix(-self.width/2,-self.height/2,0)
 
 		for wireframe in self.wireframes.values():
 			wireframe.transform(matrix)
-
-		#Scale the origin by vector
 
 		wf = Wireframe()
 		matrix = wf.scaleMatrix(*vector)
@@ -352,7 +330,6 @@ class ProjectionViewer:
 			wireframe.transform(matrix)
 
 	def move_cam_forward(self, amount):
-		#Moving the camera forward will be a positive translation in the z axis for every other object.
 		self.camera.set_position(self.center_point)
 		self.translateAll([0,0,-amount])
 		
@@ -457,14 +434,9 @@ class ProjectionViewer:
 
 	def create_rectangle_wireframe(self, first_click, second_click):
 
-		#inverseKinematics to get the z position
-
 		rectangleWf = Wireframe()
 		converted_first_click = self.convertNode(first_click)
 		converted_second_click = self.convertNode(second_click)
-
-		# print(converted_first_click)
-		# print(converted_second_click)
 
 		nodes = np.array([[converted_first_click[0], converted_first_click[1], converted_first_click[2]], [converted_first_click[0], converted_first_click[1], converted_second_click[2]], [converted_second_click[0], converted_second_click[1], converted_second_click[2]], [converted_second_click[0], converted_second_click[1], converted_first_click[2]]])
 		rectangleWf.addNodes(nodes)
@@ -482,8 +454,6 @@ class ProjectionViewer:
 	def click_function(self, position):
 
 		click_node = Wireframe()
-
-		# print(self.camera.pos[1])
 
 		convertedNode = self.convertNode(position)
 		
