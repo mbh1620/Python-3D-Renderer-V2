@@ -3,44 +3,46 @@ import wireframe
 import numpy as np
 from obj_loader import OBJ_loader
 import random
-from mesh_floor import *
 from building_generator import *
+import os
+from Classes.Light import Light
+
+import tkinter as tk
+
+from tkinter import filedialog
+
+root = tk.Tk()
+root.withdraw()
+
+load_ball_1= OBJ_loader('./Assets/sphere.obj' , 50)
+grid= OBJ_loader('./Assets/grid.obj' , 50)
+
+center_point = wireframe.Wireframe()
+
+nodes = np.array([[0,0,0]])
+
+center_point.addNodes(nodes)
+
+gridwf = grid.create_wireframe()
+gridwf.showFaces = False
+gridwf.showEdges = False
+
+ball1 = load_ball_1.create_wireframe()
+ball1.showEdges = False
+
+pv = ProjectionViewer(1200, 1000, center_point)
+
+pv.addWireframe('center_point', center_point)
+pv.addWireframe('grid', gridwf)
 
 
-cube = wireframe.Wireframe()
+light1 = Light((500, 200, -100), 1)
 
-axes = wireframe.Wireframe()
+pv.addLight('Light1', light1)
 
-a = np.array([[0,0,0],[1000,0,0], [0,1000,0], [0,0,1000], [1000, 1000, 1000], [1000, 1000, 0], [1000, 0, 1000], [0, 1000, 1000]])
+# pv.move_cam_down(49.039250000000003)
 
-b = np.array([[0,0,0],[10000,0,0],[10000, 0, 10000], [0,0,10000]])
-
-cube.addNodes(a)
-# cube.addEdges([(0,1), (0,2), (0,3)])
-cube.addEdges([(0,1), (0,2), (0,3)])
-cube.addEdges([(4,5), (4,6), (4,7)])
-
-axes.addNodes(b)
-axes.addFaces([(0,1,2,(0,100,20))])
-axes.addFaces([(2,3,0,(0,100,20))])
-
-
-cube.addFaces([(0,2,3,(100,0,0))])
-cube.addFaces([(0,1,3,(40,0,0))])
-cube.addFaces([(0,1,2,(255,0,0))])
-cube.addFaces([(4,5,6,(255,0,0))])
-cube.addFaces([(4,5,7,(100,0,0))])
-cube.addFaces([(3,4,7,(50,0,0))])
-cube.addFaces([(3,4,6,(50,0,0))])
-cube.addFaces([(2,3,7,(100,0,0))])
-cube.addFaces([(2,5,7,(100,0,0))])
-cube.addFaces([(1,2,5,(255,0,0))])
-cube.addFaces([(1,6,3,(100,0,0))])
-cube.addFaces([(1,6,5,(255,0,0))])
-	
-pv = ProjectionViewer(1200, 1000, cube)
-	
-pv.addWireframe('cube', cube)
-pv.addWireframe('axes', axes)
+pv.translateAll([600, 0, 0])
 
 pv.run()
+

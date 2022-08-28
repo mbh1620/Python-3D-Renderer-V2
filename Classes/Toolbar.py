@@ -16,6 +16,7 @@ class Toolbar:
 		self.measure_tool_flag = False
 		self.draw_rectangle_flag = False
 		self.grid_flag = False
+		self.extrude_flag = False
 
 	def render(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(0,0,self.width, 30))
@@ -84,6 +85,12 @@ class Toolbar:
 		textRect.center = (200, 110)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Extrude Tool', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 130)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
@@ -129,6 +136,8 @@ class Toolbar:
 				self.toggle_measure_tool()
 			elif 120 < x and x < 350 and 100 < y and y < 120:
 				self.toggle_rectangle_tool()
+			elif 120 < x and x < 350 and 120 < y and y < 140:
+				self.toggle_extrude_tool()
 				
 
 	def view_model(self):
@@ -151,6 +160,9 @@ class Toolbar:
 	def toggle_rectangle_tool(self):
 		self.draw_rectangle_flag = True
 		#Tool for drawing a rectangle
+
+	def toggle_extrude_tool(self):
+		self.extrude_flag = True
 
 		
 

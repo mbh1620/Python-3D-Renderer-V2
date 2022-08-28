@@ -73,6 +73,19 @@ class ProjectionViewer:
 				if event.type == pygame.QUIT:
 					running = False
 
+				elif event.type == pygame.MOUSEBUTTONDOWN:
+					if self.toolbar.extrude_flag == True:
+						start_position = pygame.mouse.get_pos()
+						wireframe = checkWireframe(start_position)
+						while event.type != pygame.MOUSEBUTTONUP:
+							print("Mouse button up")
+							end_position = pygame.mouse.get_pos()
+							self.extrude_face(wireframe, start_position, end_position)
+							for event in pygame.event.get():
+								if event.type == pygame.MOUSEBUTTONUP:
+									break
+						print("extruded")
+				
 				elif event.type == pygame.MOUSEBUTTONUP:
 
 					if self.toolbar.draw_rectangle_flag == True:
@@ -503,6 +516,26 @@ class ProjectionViewer:
 		print(output_node)
 
 		return output_node
+
+	def checkWireframe(self, point):
+		#return a wireframe which the point is in
+		pass
+		# for wireframe in self.wireframes.values:
+
+		# 	if point()
+
+
+
+		# return wireframe
+
+
+	def extrude_face(self, wireframe, start_position, end_position):
+
+		print(start_position, end_position)
+
+		#find which wireframe has been clicked from start point
+
+
 
 
 
