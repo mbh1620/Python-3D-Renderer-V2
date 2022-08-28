@@ -13,7 +13,6 @@ from tkinter import filedialog
 root = tk.Tk()
 root.withdraw()
 
-load_ball_1= OBJ_loader('./Assets/sphere.obj' , 50)
 grid= OBJ_loader('./Assets/grid.obj' , 50)
 
 center_point = wireframe.Wireframe()
@@ -26,20 +25,14 @@ gridwf = grid.create_wireframe()
 gridwf.showFaces = False
 gridwf.showEdges = False
 
-ball1 = load_ball_1.create_wireframe()
-ball1.showEdges = False
-
 pv = ProjectionViewer(1200, 1000, center_point)
 
 pv.addWireframe('center_point', center_point)
 pv.addWireframe('grid', gridwf)
 
-
 light1 = Light((500, 200, -100), 1)
 
 pv.addLight('Light1', light1)
-
-# pv.move_cam_down(49.039250000000003)
 
 pv.translateAll([600, 0, 0])
 

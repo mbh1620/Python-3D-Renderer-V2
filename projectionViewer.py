@@ -36,7 +36,7 @@ class ProjectionViewer:
 		self.displayFaces = True
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
-		self.nodeRadius = 0
+		self.nodeRadius = 2
 
 		self.toolbar = Toolbar(self.screen, self.width)
 
@@ -76,15 +76,16 @@ class ProjectionViewer:
 				elif event.type == pygame.MOUSEBUTTONDOWN:
 					if self.toolbar.extrude_flag == True:
 						start_position = pygame.mouse.get_pos()
-						wireframe = checkWireframe(start_position)
+						wireframe = self.wireframes['plane.obj3']
+						
 						while event.type != pygame.MOUSEBUTTONUP:
-							print("Mouse button up")
+							
 							end_position = pygame.mouse.get_pos()
 							self.extrude_face(wireframe, start_position, end_position)
 							for event in pygame.event.get():
 								if event.type == pygame.MOUSEBUTTONUP:
 									break
-						print("extruded")
+						
 				
 				elif event.type == pygame.MOUSEBUTTONUP:
 
@@ -532,6 +533,53 @@ class ProjectionViewer:
 	def extrude_face(self, wireframe, start_position, end_position):
 
 		print(start_position, end_position)
+
+		#We need to raise the face and then add faces on all the sides
+
+		start_x, start_y = start_position
+		end_x, end_y = end_position 
+
+		delta = end_y - start_y
+
+		delta = delta/10000
+
+		wf = Wireframe()
+
+		matrix = wf.translationMatrix(0, -delta, 0)
+
+
+		if len(wireframe.nodes) < 8:
+			face_node_array = np.array([wireframe.nodes[0][0:-1], wireframe.nodes[1][0:-1], wireframe.nodes[2][0:-1], wireframe.nodes[3][0:-1]])
+			print(face_node_array)
+			wireframe.transform(matrix)
+
+			wireframe.addNodes(face_node_array)
+			print(face_node_array)
+
+
+			face1 = Face((int(1), int(4), int(5)), [0,0,1], (211,211,211))
+			face2 = Face((int(0), int(4), int(1)), [0,0,1], (211,211,211))
+			
+			face3 = Face((int(5), int(7), int(1)), [-1,0,0], (211,211,211))
+			face4 = Face((int(1), int(7), int(3)), [-1,0,0], (211,211,211))
+			
+			face5 = Face((int(3), int(7), int(6)), [0,1,0], (211,211,211))
+			face6 = Face((int(2), int(3), int(6)), [0,1,0], (211,211,211))
+
+			face7 = Face((int(6), int(4), int(2)), [0,1,0], (211,211,211))
+			face8 = Face((int(2), int(4), int(0)), [0,1,0], (211,211,211))
+
+			wireframe.addFaces([face1, face2, face3, face4, face5, face6, face7,face8])
+
+		else:
+			wireframe.nodes[0][1] += -delta
+			wireframe.nodes[1][1] += -delta
+			wireframe.nodes[2][1] += -delta
+			wireframe.nodes[3][1] += -delta
+
+			wireframe.showEdges = True
+
+		print("node count" + str(len(wireframe.nodes)))
 
 		#find which wireframe has been clicked from start point
 
