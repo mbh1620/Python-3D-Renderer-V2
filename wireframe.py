@@ -11,7 +11,8 @@ class Wireframe:
 		self.faces = []
 		self.materials = {}
 
-		self.showEdges = True
+		self.showNodes = False
+		self.showEdges = False
 		self.showFaces = True
 
 	def addNodes(self, node_array):

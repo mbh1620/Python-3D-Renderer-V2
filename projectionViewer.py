@@ -31,7 +31,7 @@ class ProjectionViewer:
 		self.wireframes = {}
 		self.lights = {}
 
-		self.displayNodes = False
+		self.displayNodes = True
 		self.displayEdges = True
 		self.displayFaces = True
 		self.nodeColour = (255,255,255)
@@ -50,8 +50,8 @@ class ProjectionViewer:
 		key_to_function = {
 		pygame.K_LEFT: (lambda x: x.rotate_about_camera('Y', 0.05)),
  		pygame.K_RIGHT:(lambda x: x.rotate_about_camera('Y', -0.05)),
- 		pygame.K_DOWN: (lambda x: x.translateAll([0,  10, 0])),
- 		pygame.K_UP:   (lambda x: x.translateAll([0, -10, 0])),
+ 		pygame.K_DOWN: (lambda x: x.move_cam_up(10)),
+ 		pygame.K_UP:   (lambda x: x.move_cam_down(10)),
 
  		pygame.K_w: (lambda x: x.move_cam_forward(20)),
  		pygame.K_s: (lambda x: x.move_cam_backward(20)),
@@ -59,6 +59,8 @@ class ProjectionViewer:
  		pygame.K_d: (lambda x: x.move_cam_right(20)),
 
 		}
+
+		# self.camera.set_position(self.center_point)
 
 		running = True
 		flag = False
@@ -77,8 +79,10 @@ class ProjectionViewer:
 
 						if self.first_click == None:
 							self.first_click = pygame.mouse.get_pos()
+							self.click_function(self.first_click)
 						else:
 							self.second_click = pygame.mouse.get_pos()
+							self.click_function(self.second_click)
 							self.create_rectangle_wireframe(self.first_click,self.second_click)
 							self.first_click = None
 							self.second_click = None
@@ -86,7 +90,7 @@ class ProjectionViewer:
 					else:
 						self.toolbar.process_click(pygame.mouse.get_pos())
 
-
+			print(self.camera.pos)
 				
 			if keys[pygame.K_LEFT]:
 				key_to_function[pygame.K_LEFT](self)
@@ -114,18 +118,6 @@ class ProjectionViewer:
 
 	def addWireframe(self, name, wireframe):
 		self.wireframes[name] = wireframe
-		#translate to center
-		wf = Wireframe()
-		matrix = wf.translationMatrix(-self.width/2,-self.height/2,0)
-
-		for wireframe in self.wireframes.values():
-			wireframe.transform(matrix)
-
-		wf = Wireframe()
-		matrix = wf.translationMatrix(self.width,self.height,0)
-
-		for wireframe in self.wireframes.values():
-			wireframe.transform(matrix)
 
 	def addLight(self, name, light):
 		self.lights[name] = light
@@ -143,7 +135,7 @@ class ProjectionViewer:
 		for wireframe in self.wireframes.values():
 			wireframe.transform_for_perspective((self.width/2, self.height/2), self.camera.fov, self.camera.zoom)	
 
-			if self.displayNodes:
+			if self.displayNodes and wireframe.showNodes:
 				for node in wireframe.perspective_nodes:
 					if node[2] > 0 and node[2] < 10000 and node[0] > 0 and node[0] < 1199:
 						pygame.draw.circle(self.screen, self.nodeColour, (int(node[0]), int(node[1])), self.nodeRadius, 0)
@@ -217,12 +209,13 @@ class ProjectionViewer:
 		x = self.width
 		y = self.height
 		z = 2000
+		buffer_factor = 200
 		clippedNode = 0
 		
-		if node[0] > x or node[0] < 0:
+		if node[0] > x+buffer_factor or node[0] < 0-buffer_factor:
 			return 0
 
-		if node[1] > y or node[0] < 0: 
+		if node[1] > y+buffer_factor or node[0] < 0-buffer_factor: 
 			return 0
 
 		if node[2] < z and node[2] > 0:
@@ -361,23 +354,28 @@ class ProjectionViewer:
 	def move_cam_forward(self, amount):
 		#Moving the camera forward will be a positive translation in the z axis for every other object.
 		self.camera.set_position(self.center_point)
-		self.camera.define_render_space()
 		self.translateAll([0,0,-amount])
 		
 	def move_cam_backward(self, amount):
 		self.camera.set_position(self.center_point)
-		self.camera.define_render_space()
 		self.translateAll([0,0,amount])
 
 	def move_cam_left(self, amount):
 		self.camera.set_position(self.center_point)
-		self.camera.define_render_space()
 		self.translateAll([-amount,0,0])
 
 	def move_cam_right(self, amount):
 		self.camera.set_position(self.center_point)
-		self.camera.define_render_space()
 		self.translateAll([amount,0,0])
+
+	def move_cam_up(self, amount):
+		self.camera.set_position(self.center_point)
+		self.translateAll([0, amount, 0])
+
+	def move_cam_down(self, amount):
+		self.camera.set_position(self.center_point)
+		self.translateAll([0, -amount, 0])
+
 
 	def Toggle_Nodes(self):
 		if self.displayNodes == True:
@@ -462,10 +460,13 @@ class ProjectionViewer:
 		#inverseKinematics to get the z position
 
 		rectangleWf = Wireframe()
-		first_click_x, first_click_y = first_click
-		second_click_x, second_click_y = second_click
+		converted_first_click = self.convertNode(first_click)
+		converted_second_click = self.convertNode(second_click)
 
-		nodes = np.array([[first_click_x, 0, first_click_y], [first_click_x, 0, second_click_y], [second_click_x, 0, second_click_y], [second_click_x, 0, first_click_y]])
+		# print(converted_first_click)
+		# print(converted_second_click)
+
+		nodes = np.array([[converted_first_click[0], converted_first_click[1], converted_first_click[2]], [converted_first_click[0], converted_first_click[1], converted_second_click[2]], [converted_second_click[0], converted_second_click[1], converted_second_click[2]], [converted_second_click[0], converted_second_click[1], converted_first_click[2]]])
 		rectangleWf.addNodes(nodes)
 
 		fNormal = [0,1,0]
@@ -476,10 +477,23 @@ class ProjectionViewer:
 		rectangleWf.addFaces([face1])
 		rectangleWf.addFaces([face2])
 		
-		self.addWireframe('drawnRectangle', rectangleWf)
+		self.addWireframe('drawnRectangle'+str(len(self.wireframes.keys())), rectangleWf)
 
+	def click_function(self, position):
 
+		click_node = Wireframe()
 
+		# print(self.camera.pos[1])
+
+		convertedNode = self.convertNode(position)
+		
+		node = np.array([[convertedNode[0], convertedNode[1], convertedNode[2]]])
+
+		click_node.addNodes(node)
+
+		click_node.showNodes = True
+
+		self.addWireframe('clickNode'+str(len(self.wireframes.keys())), click_node)
 
 	def flag_detection(self):
 		if self.toolbar.open_flag == True:
@@ -501,6 +515,24 @@ class ProjectionViewer:
 		if self.toolbar.draw_rectangle_flag == True:
 			pass
 
+
+	def convertNode(self, node):
+
+		x,y = node
+		
+		output_node = [None, None, None]
+
+		delta = -self.camera.pos[1]
+
+		z = ((delta*self.camera.fov)-((self.height/2)*self.camera.fov)-(self.camera.zoom*y)+((self.height/2)*self.camera.zoom))/(-y+(self.height/2))
+
+		output_node[0] = (((x)*(self.camera.zoom-z) - ((self.width/2)*(self.camera.zoom-z)))/self.camera.fov)+(self.width/2)
+		output_node[1] = 0+delta
+		output_node[2] = z
+
+		print(output_node)
+
+		return output_node
 
 
 
