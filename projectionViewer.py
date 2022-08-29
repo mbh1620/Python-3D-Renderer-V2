@@ -76,7 +76,7 @@ class ProjectionViewer:
 				elif event.type == pygame.MOUSEBUTTONDOWN:
 					if self.toolbar.extrude_flag == True:
 						start_position = pygame.mouse.get_pos()
-						wireframe = self.wireframes['plane.obj3']
+						wireframe = self.wireframes['drawnRectangle5']
 						
 						while event.type != pygame.MOUSEBUTTONUP:
 							
@@ -98,6 +98,8 @@ class ProjectionViewer:
 							self.second_click = pygame.mouse.get_pos()
 							self.click_function(self.second_click)
 							self.create_rectangle_wireframe(self.first_click,self.second_click)
+
+							self.toolbar.draw_rectangle_flag = False
 							self.first_click = None
 							self.second_click = None
 
@@ -556,28 +558,25 @@ class ProjectionViewer:
 			wireframe.addNodes(face_node_array)
 			print(face_node_array)
 
-
-			face1 = Face((int(1), int(4), int(5)), [0,0,1], (211,211,211))
-			face2 = Face((int(0), int(4), int(1)), [0,0,1], (211,211,211))
+			face1 = Face((int(5), int(4), int(1)), [0,0,1], (211,211,211))
+			face2 = Face((int(1), int(4), int(0)), [0,0,1], (211,211,211))
 			
-			face3 = Face((int(5), int(7), int(1)), [-1,0,0], (211,211,211))
-			face4 = Face((int(1), int(7), int(3)), [-1,0,0], (211,211,211))
+			face3 = Face((int(0), int(7), int(3)), [-1,0,0], (211,211,211))
+			face4 = Face((int(4), int(7), int(0)), [-1,0,0], (211,211,211))
 			
 			face5 = Face((int(3), int(7), int(6)), [0,1,0], (211,211,211))
 			face6 = Face((int(2), int(3), int(6)), [0,1,0], (211,211,211))
 
-			face7 = Face((int(6), int(4), int(2)), [0,1,0], (211,211,211))
-			face8 = Face((int(2), int(4), int(0)), [0,1,0], (211,211,211))
+			face7 = Face((int(6), int(5), int(2)), [0,1,0], (211,211,211))
+			face8 = Face((int(2), int(5), int(1)), [0,1,0], (211,211,211))
 
-			wireframe.addFaces([face1, face2, face3, face4, face5, face6, face7,face8])
+			wireframe.addFaces([face1, face2, face3, face4, face5, face6, face7, face8])
 
 		else:
 			wireframe.nodes[0][1] += -delta
 			wireframe.nodes[1][1] += -delta
 			wireframe.nodes[2][1] += -delta
 			wireframe.nodes[3][1] += -delta
-
-			wireframe.showEdges = True
 
 		print("node count" + str(len(wireframe.nodes)))
 
