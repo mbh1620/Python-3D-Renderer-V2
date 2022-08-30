@@ -34,6 +34,8 @@ class Toolbar:
 		if self.view_flag:
 			self.view()
 
+		self.selector()
+
 	def file(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(0,30,200, 250))
 
@@ -86,9 +88,15 @@ class Toolbar:
 		self.screen.blit(text, textRect)
 
 		font = pygame.font.Font('freesansbold.ttf', 20)
-		text = font.render(f'Extrude Tool', True, (255,255,255),(161, 161, 161))
+		text = font.render(f'Draw Polygon Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 130)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Extrude Tool', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 150)
 		self.screen.blit(text, textRect)
 
 	def process_click(self, cursor_position):
@@ -128,6 +136,7 @@ class Toolbar:
 				pass
 
 		if self.view_flag:
+			
 			if 120 < x and x < 350 and 30 < y and y < 60:
 				self.view_model()
 			elif 120 < x and x < 350 and 60 < y and y < 80:
@@ -136,8 +145,27 @@ class Toolbar:
 				self.toggle_measure_tool()
 			elif 120 < x and x < 350 and 100 < y and y < 120:
 				self.toggle_rectangle_tool()
-			elif 120 < x and x < 350 and 120 < y and y < 140:
+			elif 120 < x and x < 350 and 140 < y and y < 160:
 				self.toggle_extrude_tool()
+
+	def selector(self):
+
+		selector_distance = -10
+
+		if self.view_model_flag:
+			selector_distance = 50
+		elif self.grid_flag:
+			selector_distance = 70
+		elif self.draw_rectangle_flag == True:
+			selector_distance = 110
+		elif self.extrude_flag == True:
+			selector_distance = 150
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'√', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (310, selector_distance)
+		self.screen.blit(text, textRect)
 				
 
 	def view_model(self):

@@ -8,6 +8,7 @@ from obj_loader import OBJ_loader
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from Functions.pointInTriangle import pointInTriangle
 from Classes.Face import Face
 
 class ProjectionViewer:
@@ -60,8 +61,6 @@ class ProjectionViewer:
 
 		}
 
-		# self.camera.set_position(self.center_point)
-
 		running = True
 		flag = False
 
@@ -74,14 +73,18 @@ class ProjectionViewer:
 					running = False
 
 				elif event.type == pygame.MOUSEBUTTONDOWN:
+
 					if self.toolbar.extrude_flag == True:
 						start_position = pygame.mouse.get_pos()
-						wireframe = self.wireframes['drawnRectangle5']
+				
+						wireframe = self.selectFace(start_position)
 						
 						while event.type != pygame.MOUSEBUTTONUP:
 							
 							end_position = pygame.mouse.get_pos()
+
 							self.extrude_face(wireframe, start_position, end_position)
+
 							for event in pygame.event.get():
 								if event.type == pygame.MOUSEBUTTONUP:
 									break
@@ -90,6 +93,7 @@ class ProjectionViewer:
 				elif event.type == pygame.MOUSEBUTTONUP:
 
 					if self.toolbar.draw_rectangle_flag == True:
+						self.toolbar.view_flag = False
 
 						if self.first_click == None:
 							self.first_click = pygame.mouse.get_pos()
@@ -516,25 +520,31 @@ class ProjectionViewer:
 		output_node[1] = 0+delta
 		output_node[2] = z
 
-		print(output_node)
-
 		return output_node
 
-	def checkWireframe(self, point):
-		#return a wireframe which the point is in
-		pass
-		# for wireframe in self.wireframes.values:
+	def selectFace(self, clickPoint):
 
-		# 	if point()
+		for wireframe in self.wireframes.values():
+			if wireframe == self.wireframes['grid']:
+				pass
+			else:
+				if self.displayFaces and wireframe.showFaces:
+					for face in wireframe.faces:
+						n1, n2, n3 = face.vertices
+				
+						n1_ = wireframe.perspective_nodes[n1-2]
+						n2_ = wireframe.perspective_nodes[n2-2]
+						n3_ = wireframe.perspective_nodes[n3-2]
 
+						inTriangle = pointInTriangle(clickPoint, n1_, n2_, n3_)
 
-
-		# return wireframe
+						if inTriangle == True:
+							return wireframe
 
 
 	def extrude_face(self, wireframe, start_position, end_position):
 
-		print(start_position, end_position)
+		# print(start_position, end_position)
 
 		#We need to raise the face and then add faces on all the sides
 
@@ -552,11 +562,11 @@ class ProjectionViewer:
 
 		if len(wireframe.nodes) < 8:
 			face_node_array = np.array([wireframe.nodes[0][0:-1], wireframe.nodes[1][0:-1], wireframe.nodes[2][0:-1], wireframe.nodes[3][0:-1]])
-			print(face_node_array)
+			
 			wireframe.transform(matrix)
 
 			wireframe.addNodes(face_node_array)
-			print(face_node_array)
+			
 
 			face1 = Face((int(5), int(4), int(1)), [0,0,1], (211,211,211))
 			face2 = Face((int(1), int(4), int(0)), [0,0,1], (211,211,211))
@@ -578,10 +588,7 @@ class ProjectionViewer:
 			wireframe.nodes[2][1] += -delta
 			wireframe.nodes[3][1] += -delta
 
-		print("node count" + str(len(wireframe.nodes)))
-
 		#find which wireframe has been clicked from start point
-
 
 
 
