@@ -76,18 +76,31 @@ class ProjectionViewer:
 
 					if self.toolbar.extrude_flag == True:
 						start_position = pygame.mouse.get_pos()
-				
-						wireframe = self.selectFace(start_position)
-						
-						while event.type != pygame.MOUSEBUTTONUP:
+
+						x, y = start_position
+
+						if 120 < x and x < 350 and 140 < y and y < 160:
+							# self.toolbar.extrude_flag = False
+							# break
+							pass
+						else:
+
+							wireframe = self.selectFace(start_position)
+
+							if wireframe == None:
+								pass
+
+							else:
 							
-							end_position = pygame.mouse.get_pos()
+								while event.type != pygame.MOUSEBUTTONUP:
+									
+									end_position = pygame.mouse.get_pos()
 
-							self.extrude_face(wireframe, start_position, end_position)
+									self.extrude_face(wireframe, start_position, end_position)
 
-							for event in pygame.event.get():
-								if event.type == pygame.MOUSEBUTTONUP:
-									break
+									for event in pygame.event.get():
+										if event.type == pygame.MOUSEBUTTONUP:
+											break
 						
 				
 				elif event.type == pygame.MOUSEBUTTONUP:

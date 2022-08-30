@@ -190,7 +190,10 @@ class Toolbar:
 		#Tool for drawing a rectangle
 
 	def toggle_extrude_tool(self):
-		self.extrude_flag = True
+		if self.extrude_flag:
+			self.extrude_flag = False
+		else: 
+			self.extrude_flag = True
 
 		
 
