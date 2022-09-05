@@ -15,7 +15,9 @@ class Toolbar:
 		self.view_model_flag = False
 		self.measure_tool_flag = False
 		self.draw_rectangle_flag = False
-		self.grid_flag = False
+		self.draw_circle_flag = False
+
+		self.grid_flag = True
 		self.extrude_flag = False
 
 	def render(self):
@@ -94,9 +96,15 @@ class Toolbar:
 		self.screen.blit(text, textRect)
 
 		font = pygame.font.Font('freesansbold.ttf', 20)
-		text = font.render(f'Extrude Tool', True, (255,255,255),(161, 161, 161))
+		text = font.render(f'Draw Circle Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 150)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Extrude Tool', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 170)
 		self.screen.blit(text, textRect)
 
 	def process_click(self, cursor_position):
@@ -145,7 +153,11 @@ class Toolbar:
 				self.toggle_measure_tool()
 			elif 120 < x and x < 350 and 100 < y and y < 120:
 				self.toggle_rectangle_tool()
+			elif 120 < x and x < 350 and 120 < y and y < 140:
+				self.toggle_polygon_tool()
 			elif 120 < x and x < 350 and 140 < y and y < 160:
+				self.toggle_circle_tool()
+			elif 120 < x and x < 350 and 160 < y and y < 180:
 				self.toggle_extrude_tool()
 
 	def selector(self):
@@ -188,6 +200,13 @@ class Toolbar:
 	def toggle_rectangle_tool(self):
 		self.draw_rectangle_flag = True
 		#Tool for drawing a rectangle
+
+	def toggle_circle_tool(self):
+		self.draw_circle_flag = True
+
+	def toggle_polygon_tool(self):
+		self.draw_polygon_flag = True
+
 
 	def toggle_extrude_tool(self):
 		if self.extrude_flag:

@@ -101,7 +101,6 @@ class ProjectionViewer:
 									for event in pygame.event.get():
 										if event.type == pygame.MOUSEBUTTONUP:
 											break
-						
 				
 				elif event.type == pygame.MOUSEBUTTONUP:
 
@@ -119,6 +118,20 @@ class ProjectionViewer:
 							self.toolbar.draw_rectangle_flag = False
 							self.first_click = None
 							self.second_click = None
+
+					if self.toolbar.draw_circle_flag == True:
+						self.toolbar.view_flag = False
+
+						if self.first_click == None:
+							self.first_click = pygame.mouse.get_pos()
+							self.click_function(self.first_click)
+						else:
+							self.second_click = pygame.mouse.get_pos()
+							self.click_function(self.second_click)
+							self.create_circle_wireframe(self.first_click, self.second_click)
+
+							self.toolbar.draw_circle_flag = False
+
 
 					else:
 						self.toolbar.process_click(pygame.mouse.get_pos())
@@ -484,6 +497,59 @@ class ProjectionViewer:
 		
 		self.addWireframe('drawnRectangle'+str(len(self.wireframes.keys())), rectangleWf)
 
+	def create_circle_wireframe(self, center_point, radius_point):
+
+		world_center_point = self.convertNode(center_point)
+		world_radius_point = self.convertNode(radius_point)
+
+		radius = math.sqrt(((world_radius_point[0]-world_center_point[0])**2)+(world_radius_point[2]-world_center_point[2])**2)
+
+		number_of_points_at_edge=30
+
+		degree_intervals = 360/number_of_points_at_edge
+
+		theta = 0 
+
+		print(radius)
+
+		circle_points = []
+		circle_edges = []
+		circle_faces = []
+		fNormal = [0,1,-1]
+
+		circle_points.append(world_center_point)
+
+		for i in range(0,number_of_points_at_edge):
+
+			x = world_center_point[0] + (radius * math.cos((theta/360)*2*math.pi))
+			y = 0
+			z = world_center_point[2] + (radius * math.sin((theta/360)*2*math.pi))
+			theta += degree_intervals
+
+			if i <= number_of_points_at_edge:
+				if i == 0:
+					pass
+				else:
+					circle_edges.append((i, i+1))
+					circle_faces.append(Face((i+1, i, 0), fNormal, (122,122,122)))
+
+			circle_points.append([x, y, z])
+
+		circle_edges.append((number_of_points_at_edge-1, 1))
+		circle_faces.append(Face((1, number_of_points_at_edge-1, 0), fNormal, (122,122,122)))
+
+		circle_wireframe = Wireframe()
+
+		circle_wireframe.type ="Circle"
+
+		circle_wireframe.addNodes(np.array(circle_points))
+		circle_wireframe.addEdges(circle_edges)
+		circle_wireframe.addFaces(circle_faces)
+
+		circle_wireframe.showFaces = True
+
+		self.addWireframe('circle_wireframe' + str(len(self.wireframes.values())), circle_wireframe)
+
 	def click_function(self, position):
 
 		click_node = Wireframe()
@@ -572,15 +638,15 @@ class ProjectionViewer:
 
 		matrix = wf.translationMatrix(0, -delta, 0)
 
-
-		if len(wireframe.nodes) < 8:
+		if len(wireframe.nodes) == 4:
 			face_node_array = np.array([wireframe.nodes[0][0:-1], wireframe.nodes[1][0:-1], wireframe.nodes[2][0:-1], wireframe.nodes[3][0:-1]])
 			
+			print(face_node_array)
+
 			wireframe.transform(matrix)
 
 			wireframe.addNodes(face_node_array)
 			
-
 			face1 = Face((int(5), int(4), int(1)), [0,0,1], (211,211,211))
 			face2 = Face((int(1), int(4), int(0)), [0,0,1], (211,211,211))
 			
@@ -595,13 +661,44 @@ class ProjectionViewer:
 
 			wireframe.addFaces([face1, face2, face3, face4, face5, face6, face7, face8])
 
+		if wireframe.type == "Circle":
+
+			node_len = 30
+
+			face_node_array = []
+
+			for node in wireframe.nodes:
+				face_node_array.append(node[:-1])
+
+			wireframe.showNodes = True
+
+			wireframe.type = "Cylinder"
+
+			wireframe.addNodes(np.array(face_node_array))
+
+			edge_list = []
+
+			for i in range(0,int(len(wireframe.nodes)/2)):
+				edge_list.append((i,i+31))
+				edge_list.append((i,i+30))
+				edge_list.append((i+30, i+31))
+
+			edge_list.append((59,32))
+
+			wireframe.addEdges(edge_list)
+
+			wireframe.showEdges = True
+
+		if wireframe.type == "Cylinder" and len(wireframe.nodes) >= 30:
+			for node in wireframe.nodes[-31:]:
+				node[1] += -delta
+
 		else:
 			wireframe.nodes[0][1] += -delta
 			wireframe.nodes[1][1] += -delta
 			wireframe.nodes[2][1] += -delta
 			wireframe.nodes[3][1] += -delta
 
-		#find which wireframe has been clicked from start point
 
 
 

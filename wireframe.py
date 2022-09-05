@@ -10,6 +10,7 @@ class Wireframe:
 		self.edges = []
 		self.faces = []
 		self.materials = {}
+		self.type = None
 
 		self.showNodes = False
 		self.showEdges = False
