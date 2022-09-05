@@ -43,6 +43,7 @@ class ProjectionViewer:
 
 		self.first_click = None
 		self.second_click = None
+		self.converted_clicks = []
 
 		pygame.init()
 
@@ -131,6 +132,11 @@ class ProjectionViewer:
 							self.create_circle_wireframe(self.first_click, self.second_click)
 
 							self.toolbar.draw_circle_flag = False
+
+					if self.toolbar.draw_polygon_flag:
+						self.polygon_clicker(pygame.mouse.get_pos())
+						
+
 
 
 					else:
@@ -497,6 +503,57 @@ class ProjectionViewer:
 		
 		self.addWireframe('drawnRectangle'+str(len(self.wireframes.keys())), rectangleWf)
 
+	def polygon_clicker(self, click):
+
+		node = self.convertNode(click)
+
+		if len(self.converted_clicks) == 0:
+			self.converted_clicks.append(node)
+			self.click_function(click)
+			return 0
+
+		if abs(node[0] - self.converted_clicks[0][0]) > 20 or abs(node[2] - self.converted_clicks[0][2]) > 20:
+			self.converted_clicks.append(node)
+			self.click_function(click)
+		else:
+	
+			self.toolbar.draw_polygon_flag = False
+			self.create_polygon_wireframe(self.converted_clicks)
+			self.converted_clicks = []
+
+		return 0
+
+	def create_polygon_wireframe(self, clicks):
+
+		polygonWf = Wireframe()
+
+		polygonWf.addNodes(np.array(clicks))
+
+		edge_list = []
+		polygon_face_list = []
+
+		for i in range(0,len(clicks)-1):
+			edge_list.append((i, i+1))
+
+		fNormal = [0,1,0]
+
+		num_of_triangles = len(clicks)-2
+
+		for i in range(0, num_of_triangles):
+			polygon_face_list.append(Face((i+2, i+1, 0), fNormal, (122,122,122)))
+
+		polygon_face_list.append
+
+		edge_list.append((len(clicks)-1, 0))
+
+		polygonWf.addEdges(edge_list)
+		polygonWf.addFaces(polygon_face_list)
+
+		polygonWf.showNodes = True
+		polygonWf.showEdges = True
+
+		self.addWireframe('polygon'+str(len(self.wireframes.keys())), polygonWf)
+
 	def create_circle_wireframe(self, center_point, radius_point):
 
 		world_center_point = self.convertNode(center_point)
@@ -509,8 +566,6 @@ class ProjectionViewer:
 		degree_intervals = 360/number_of_points_at_edge
 
 		theta = 0 
-
-		print(radius)
 
 		circle_points = []
 		circle_edges = []
@@ -683,7 +738,7 @@ class ProjectionViewer:
 				edge_list.append((i,i+30))
 				edge_list.append((i+30, i+31))
 
-			edge_list.append((59,32))
+			edge_list.append((61,32))
 
 			wireframe.addEdges(edge_list)
 

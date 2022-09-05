@@ -16,6 +16,7 @@ class Toolbar:
 		self.measure_tool_flag = False
 		self.draw_rectangle_flag = False
 		self.draw_circle_flag = False
+		self.draw_polygon_flag = False
 
 		self.grid_flag = True
 		self.extrude_flag = False
@@ -206,7 +207,6 @@ class Toolbar:
 
 	def toggle_polygon_tool(self):
 		self.draw_polygon_flag = True
-
 
 	def toggle_extrude_tool(self):
 		if self.extrude_flag:
