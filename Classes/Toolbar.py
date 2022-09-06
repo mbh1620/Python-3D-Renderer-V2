@@ -17,6 +17,7 @@ class Toolbar:
 		self.draw_rectangle_flag = False
 		self.draw_circle_flag = False
 		self.draw_polygon_flag = False
+		self.change_colour_flag = False
 
 		self.grid_flag = True
 		self.extrude_flag = False
@@ -108,6 +109,24 @@ class Toolbar:
 		textRect.center = (200, 170)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Copy Mesh Object', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 190)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Translate Object', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 210)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Change Object Colour', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 230)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
@@ -160,6 +179,8 @@ class Toolbar:
 				self.toggle_circle_tool()
 			elif 120 < x and x < 350 and 160 < y and y < 180:
 				self.toggle_extrude_tool()
+			elif 120 < x and x < 350 and 220 < y and y < 240:
+				self.toggle_change_colour()
 
 	def selector(self):
 
@@ -213,6 +234,9 @@ class Toolbar:
 			self.extrude_flag = False
 		else: 
 			self.extrude_flag = True
+
+	def toggle_change_colour(self):
+		self.change_colour_flag = True
 
 		
 

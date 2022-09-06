@@ -37,4 +37,3 @@ pv.addLight('Light1', light1)
 pv.translateAll([600, 0, 0])
 
 pv.run()
-

@@ -8,6 +8,7 @@ from obj_loader import OBJ_loader
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from tkinter.colorchooser import askcolor
 from Functions.pointInTriangle import pointInTriangle
 from Classes.Face import Face
 
@@ -102,6 +103,16 @@ class ProjectionViewer:
 									for event in pygame.event.get():
 										if event.type == pygame.MOUSEBUTTONUP:
 											break
+
+					if self.toolbar.change_colour_flag == True:
+
+						start_position = pygame.mouse.get_pos()
+
+						wireframe = self.selectFace(start_position)
+
+						self.change_wireframe_colour(wireframe)
+
+						self.toolbar.change_colour_flag = False
 				
 				elif event.type == pygame.MOUSEBUTTONUP:
 
@@ -131,14 +142,14 @@ class ProjectionViewer:
 							self.click_function(self.second_click)
 							self.create_circle_wireframe(self.first_click, self.second_click)
 
+							self.first_click = None
+							self.second_click = None
+
 							self.toolbar.draw_circle_flag = False
 
 					if self.toolbar.draw_polygon_flag:
 						self.polygon_clicker(pygame.mouse.get_pos())
-						
-
-
-
+					
 					else:
 						self.toolbar.process_click(pygame.mouse.get_pos())
 				
@@ -676,11 +687,7 @@ class ProjectionViewer:
 							return wireframe
 
 
-	def extrude_face(self, wireframe, start_position, end_position):
-
-		# print(start_position, end_position)
-
-		#We need to raise the face and then add faces on all the sides
+	def extrude_face(self, wireframe, start_position, end_position):	
 
 		start_x, start_y = start_position
 		end_x, end_y = end_position 
@@ -733,16 +740,39 @@ class ProjectionViewer:
 
 			edge_list = []
 
-			for i in range(0,int(len(wireframe.nodes)/2)):
-				edge_list.append((i,i+31))
-				edge_list.append((i,i+30))
-				edge_list.append((i+30, i+31))
+			face_list = []
+
+			for i in range(2,int(len(wireframe.nodes)/2)):
+			
+				if i == 1:
+					pass
+				else:
+					edge_list.append((i,i+31))
+					edge_list.append((i,i+30))
+					edge_list.append((i+30, i+31))
+
+			for i in range(1, int(len(wireframe.nodes)/2)):
+
+				face_list.append(Face((i+31, i+1,i), [0,1,0], (211,211,211)))
+				face_list.append(Face((i, i+30, i+31), [0,1,0], (211,211,211)))
+
+			face_list.append(Face((1, 30, 61), [0,1,0], (211,211,211)))
+			face_list.append(Face((32, 1, 61), [0,1,0], (211,211,211)))
+
+			for i in range(31, len(wireframe.nodes)-2):
+
+				face_list.append(Face((i+2, i+1,31), [0,1,0], (211,211,211)))
+
+			face_list.append(Face((32, 61,31), [0,1,0], (211,211,211)))
 
 			edge_list.append((61,32))
 
 			wireframe.addEdges(edge_list)
 
-			wireframe.showEdges = True
+			wireframe.addFaces(face_list)
+
+			wireframe.showEdges = False
+			wireframe.showNodes = False
 
 		if wireframe.type == "Cylinder" and len(wireframe.nodes) >= 30:
 			for node in wireframe.nodes[-31:]:
@@ -753,6 +783,18 @@ class ProjectionViewer:
 			wireframe.nodes[1][1] += -delta
 			wireframe.nodes[2][1] += -delta
 			wireframe.nodes[3][1] += -delta
+
+	def change_wireframe_colour(self,wireframe):
+
+		colour = askcolor(title="Choose Colour for Object")
+
+		rgb, hex_Val = colour
+
+		print(colour)
+
+		for face in wireframe.faces:
+			face.material = rgb
+
 
 
 
