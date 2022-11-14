@@ -10,4 +10,3 @@ def pointInTriangle(singlePoint, p1, p2, p3):
 	has_pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
 
 	return not(has_neg and has_pos)
-

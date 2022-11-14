@@ -228,7 +228,13 @@ class ProjectionViewer:
 						if cull:
 							pass
 						else:
-							pygame.draw.polygon(self.screen, [self.processLighting(face) * x for x in face.material], [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
+							colour = [self.processLighting(face) * x for x in face.material]
+							
+							if math.isnan(colour[0]):
+								colour = [70,70,70]
+
+							# self.rasterTriangle(clipN1[:2], clipN2[:2], clipN3[:2], colour)	
+							pygame.draw.polygon(self.screen, colour, [clipN1[:2], clipN2[:2], clipN3[:2]], 0)
 			else:
 				pass
 
@@ -436,7 +442,7 @@ class ProjectionViewer:
 		else:
 			file_path = filename
 
-		model= OBJ_loader(file_path, 50)
+		model= OBJ_loader(file_path, 100)
 
 		model_wf = model.create_wireframe()
 
@@ -581,6 +587,7 @@ class ProjectionViewer:
 		circle_points = []
 		circle_edges = []
 		circle_faces = []
+		fNormals = []
 		fNormal = [0,1,-1]
 
 		circle_points.append(world_center_point)
@@ -604,9 +611,15 @@ class ProjectionViewer:
 		circle_edges.append((number_of_points_at_edge-1, 1))
 		circle_faces.append(Face((1, number_of_points_at_edge-1, 0), fNormal, (122,122,122)))
 
+		for i in circle_faces:
+		
+			p1, p2, p3 = i.vertices
+			facePoints = circle_points[p1], circle_points[p2], circle_points[p3]
+			i.fNormal = self.generate_face_normal(facePoints)
+
 		circle_wireframe = Wireframe()
 
-		circle_wireframe.type ="Circle"
+		circle_wireframe.type = "Circle"
 
 		circle_wireframe.addNodes(np.array(circle_points))
 		circle_wireframe.addEdges(circle_edges)
@@ -708,18 +721,29 @@ class ProjectionViewer:
 			wireframe.transform(matrix)
 
 			wireframe.addNodes(face_node_array)
-			
-			face1 = Face((int(5), int(4), int(1)), [0,0,1], (211,211,211))
-			face2 = Face((int(1), int(4), int(0)), [0,0,1], (211,211,211))
-			
-			face3 = Face((int(0), int(7), int(3)), [-1,0,0], (211,211,211))
-			face4 = Face((int(4), int(7), int(0)), [-1,0,0], (211,211,211))
-			
-			face5 = Face((int(3), int(7), int(6)), [0,1,0], (211,211,211))
-			face6 = Face((int(2), int(3), int(6)), [0,1,0], (211,211,211))
 
-			face7 = Face((int(6), int(5), int(2)), [0,1,0], (211,211,211))
-			face8 = Face((int(2), int(5), int(1)), [0,1,0], (211,211,211))
+			print("wireframe nodes")
+			print(wireframe.nodes[5])
+
+			facePoints = wireframe.nodes[5], wireframe.nodes[4], wireframe.nodes[1]
+			face1 = Face((int(5), int(4), int(1)), self.generate_face_normal(facePoints), (211,211,211))
+			facePoints = wireframe.nodes[1], wireframe.nodes[4], wireframe.nodes[0]
+			face2 = Face((int(1), int(4), int(0)), self.generate_face_normal(facePoints), (211,211,211))
+
+			facePoints = wireframe.nodes[0], wireframe.nodes[7], wireframe.nodes[3]
+			face3 = Face((int(0), int(7), int(3)), self.generate_face_normal(facePoints), (211,211,211))
+			facePoints = wireframe.nodes[4], wireframe.nodes[7], wireframe.nodes[0]
+			face4 = Face((int(4), int(7), int(0)), self.generate_face_normal(facePoints), (211,211,211))
+
+			facePoints = wireframe.nodes[3], wireframe.nodes[7], wireframe.nodes[6]
+			face5 = Face((int(3), int(7), int(6)), self.generate_face_normal(facePoints), (211,211,211))
+			facePoints = wireframe.nodes[2], wireframe.nodes[3], wireframe.nodes[6]
+			face6 = Face((int(2), int(3), int(6)), self.generate_face_normal(facePoints), (211,211,211))
+
+			facePoints = wireframe.nodes[6], wireframe.nodes[5], wireframe.nodes[2]
+			face7 = Face((int(6), int(5), int(2)), self.generate_face_normal(facePoints), (211,211,211))
+			facePoints = wireframe.nodes[2], wireframe.nodes[5], wireframe.nodes[1]
+			face8 = Face((int(2), int(5), int(1)), self.generate_face_normal(facePoints), (211,211,211))
 
 			wireframe.addFaces([face1, face2, face3, face4, face5, face6, face7, face8])
 
@@ -776,13 +800,31 @@ class ProjectionViewer:
 
 		if wireframe.type == "Cylinder" and len(wireframe.nodes) >= 30:
 			for node in wireframe.nodes[-31:]:
-				node[1] += -delta
+				node[1] += -delta*100
+
+			for i in wireframe.faces:
+
+				p1, p2, p3 = i.vertices
+						
+				facePoints = wireframe.nodes[p1], wireframe.nodes[p2], wireframe.nodes[p3]
+
+				i.fNormal = self.generate_face_normal(facePoints)
 
 		else:
 			wireframe.nodes[0][1] += -delta
 			wireframe.nodes[1][1] += -delta
 			wireframe.nodes[2][1] += -delta
 			wireframe.nodes[3][1] += -delta
+
+			for i in wireframe.faces:
+
+				p1, p2, p3 = i.vertices
+						
+				facePoints = wireframe.nodes[p1], wireframe.nodes[p2], wireframe.nodes[p3]
+
+				i.fNormal = self.generate_face_normal(facePoints)
+
+
 
 	def change_wireframe_colour(self,wireframe):
 
@@ -794,6 +836,82 @@ class ProjectionViewer:
 
 		for face in wireframe.faces:
 			face.material = rgb
+
+	def generate_face_normal(self, face):
+
+		faceNormal = [None, None, None]
+
+		vectorU = self.minus(face[1], face[0])
+		vectorV = self.minus(face[2], face[0])
+
+		faceNormal[0] = (vectorU[1]*vectorV[2])-(vectorU[2]*vectorV[1])	
+		faceNormal[1] = (vectorU[2]*vectorV[0])-(vectorU[0]*vectorV[2])
+		faceNormal[2] = (vectorU[0]*vectorV[1])-(vectorU[1]*vectorV[0])
+		
+		#Now need to normalize the vector
+
+		vectorNormalX = faceNormal[0]
+		vectorNormalY = faceNormal[1]
+		vectorNormalZ = faceNormal[2]
+
+		bottom = math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
+
+		faceNormal[0] = faceNormal[0] / bottom
+		faceNormal[1] = faceNormal[1] / bottom
+		faceNormal[2] = faceNormal[2] / bottom
+
+		return faceNormal
+
+	def minus(self, a, b):
+
+		vector = [None, None, None]
+		
+		vector[0] = a[0] - b[0]
+		vector[1] = a[1] - b[1]
+		vector[2] = a[2] - b[2]
+
+		#normaliseVector here! 
+
+		vectorX = vector[0]
+		vectorY = vector[1]
+		vectorZ = vector[2]
+
+		bottom = math.sqrt((vectorX**2) + (vectorY**2) + (vectorZ**2))
+
+		# if bottom != 0:
+		# 	vector[0] = vector[0] / bottom
+		# 	vector[1] = vector[1] / bottom
+		# 	vector[2] = vector[2] / bottom
+
+		return vector
+
+	def rasterTriangle(self, p1, p2, p3, colour):
+
+		p1x, p1y = p1
+		p2x, p2y = p2
+		p3x, p3y = p3
+
+		x_coordinates = [p1x,p2x,p3x]
+		y_coordinates = [p1y,p2y,p3y]
+
+		boundary_x = [min(x_coordinates), max(x_coordinates)]
+		boundary_y = [min(y_coordinates), max(y_coordinates)]
+
+		for x in np.arange(boundary_x[0], boundary_x[1]+1, 1):
+			for y in np.arange(boundary_y[0], boundary_y[1]+1, 1):
+				
+				point = [x, y]
+				n1 = [p1x, p1y]
+				n2 = [p2x, p2y]
+				n3 = [p3x, p3y]
+
+				if pointInTriangle(point, n1, n2, n3) == True:
+
+					pygame.draw.circle(self.screen, colour, (int(x), int(y)), 0, 0)
+
+
+
+
 
 
 
