@@ -46,6 +46,8 @@ class ProjectionViewer:
 		self.second_click = None
 		self.converted_clicks = []
 
+		self.shading = True
+
 		pygame.init()
 
 	def run(self):
@@ -228,7 +230,11 @@ class ProjectionViewer:
 						if cull:
 							pass
 						else:
-							colour = [self.processLighting(face) * x for x in face.material]
+
+							if self.toolbar.shading_flag == True:
+								colour = [self.processLighting(face) * x for x in face.material]
+							else:
+								colour = [x for x in face.material]
 							
 							if math.isnan(colour[0]):
 								colour = [70,70,70]

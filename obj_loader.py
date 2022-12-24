@@ -22,15 +22,15 @@ class OBJ_loader:
 		self.vertexNormalArray = []
 		self.materialDictionary = {}
 
-		self.process_material_file()
-		self.process_file()
+		mtlFile = self.process_material_file()
+		self.process_file(mtlFile)
 
-	def process_file(self):
+	def process_file(self, mtlFile):
 
 		f = open(self.filename, "r")
 
 		if len(self.materialDictionary.keys()) == 0:
-			self.materialDictionary['default'] = (255,0,0)
+			self.materialDictionary['default'] = (255,255,255)
 
 		material = ''
 
@@ -48,8 +48,11 @@ class OBJ_loader:
 				self.nodeArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
 
 			elif i.find('usemtl') != -1:
-				i = i.split(' ')
-				material = i[1]
+				if mtlFile == False:
+					material = 'default'
+				else:
+					i = i.split(' ')
+					material = i[1]
 
 			elif i[0] == 'f':
 
@@ -110,6 +113,8 @@ class OBJ_loader:
 		averagedVertexNormal[1] = averagedVertexNormal[1] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
 		averagedVertexNormal[2] = averagedVertexNormal[2] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
 
+		print(str(averagedVertexNormal[0]) + " " + str(averagedVertexNormal[1]) + " " + str(averagedVertexNormal[0]))
+
 		return averagedVertexNormal
 
 	def process_material_file(self):
@@ -119,20 +124,36 @@ class OBJ_loader:
 
 		materialName = ''
 
-		f = open(filename, 'r')
+		skipFlag = False
+		mtlFile = True
+
+		try:
+			f = open(filename, 'r')
+
+		except:
+			print("No Mtl file!")
+			skipFlag = True
+			mtlFile = False
 		
-		for i in f:
-			if i.find('newmtl') == 0:
-				i = i.split(' ')
-				materialName = i[-1]
+		if skipFlag == False:
 
-			if i[0] == 'K' and i[1] == 'd':
-				i = i.split(' ')
-				r = float(i[1])*255
-				g = float(i[2])*255
-				b = float(i[3])*255
+			for i in f:
+				if i.find('newmtl') == 0:
+					i = i.split(' ')
+					materialName = i[-1]
+					print(materialName)
 
-				self.materialDictionary[materialName] = (r,g,b)
+				if i[0] == 'K' and i[1] == 'd':
+					i = i.split(' ')
+					r = float(i[1])*255
+					g = float(i[2])*255
+					b = float(i[3])*255
+
+					self.materialDictionary[materialName] = (r,g,b)
+
+		return mtlFile
+
+				
 				
 	def create_wireframe(self):
 

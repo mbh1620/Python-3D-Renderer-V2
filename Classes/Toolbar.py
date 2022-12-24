@@ -18,6 +18,7 @@ class Toolbar:
 		self.draw_circle_flag = False
 		self.draw_polygon_flag = False
 		self.change_colour_flag = False
+		self.shading_flag = True
 
 		self.grid_flag = True
 		self.extrude_flag = False
@@ -127,6 +128,12 @@ class Toolbar:
 		textRect.center = (200, 230)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Toggle Shading', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 250)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
@@ -181,6 +188,8 @@ class Toolbar:
 				self.toggle_extrude_tool()
 			elif 120 < x and x < 350 and 220 < y and y < 240:
 				self.toggle_change_colour()
+			elif 120 < x and x < 350 and 240 < y and y < 260:
+				self.toggle_shading()
 
 	def selector(self):
 
@@ -238,5 +247,10 @@ class Toolbar:
 	def toggle_change_colour(self):
 		self.change_colour_flag = True
 
+	def toggle_shading(self):
+		if self.shading_flag:
+			self.shading_flag = False
+		else:
+			self.shading_flag = True
 		
 
