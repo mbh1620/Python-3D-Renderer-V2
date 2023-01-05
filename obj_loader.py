@@ -92,6 +92,12 @@ class OBJ_loader:
 			elif i[0] == 'm':
 				#use material to add the colour to the face
 				pass
+
+			elif i[0] == 'l':
+
+				i = i.split()
+				self.edgeArray.append((int(i[1])-1, int(i[2])-1))
+
 			else:
 				pass
 
@@ -109,9 +115,14 @@ class OBJ_loader:
 		vectorNormalY = averagedVertexNormal[1]
 		vectorNormalZ = averagedVertexNormal[2]
 
-		averagedVertexNormal[0] = averagedVertexNormal[0] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
-		averagedVertexNormal[1] = averagedVertexNormal[1] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
-		averagedVertexNormal[2] = averagedVertexNormal[2] / math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
+		bottom = math.sqrt((vectorNormalX**2) + (vectorNormalY**2) + (vectorNormalZ**2))
+
+		if bottom == 0:
+			bottom = 0.1
+
+		averagedVertexNormal[0] = averagedVertexNormal[0] / bottom
+		averagedVertexNormal[1] = averagedVertexNormal[1] / bottom
+		averagedVertexNormal[2] = averagedVertexNormal[2] / bottom
 
 		print(str(averagedVertexNormal[0]) + " " + str(averagedVertexNormal[1]) + " " + str(averagedVertexNormal[0]))
 

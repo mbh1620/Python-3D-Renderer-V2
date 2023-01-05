@@ -19,6 +19,8 @@ class Toolbar:
 		self.draw_polygon_flag = False
 		self.change_colour_flag = False
 		self.shading_flag = True
+		self.faces_flag = False
+		self.edges_flag = True
 
 		self.grid_flag = True
 		self.extrude_flag = False
@@ -134,6 +136,18 @@ class Toolbar:
 		textRect.center = (200, 250)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Toggle Faces', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 280)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Toggle Edges', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 310)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
@@ -186,10 +200,14 @@ class Toolbar:
 				self.toggle_circle_tool()
 			elif 120 < x and x < 350 and 160 < y and y < 180:
 				self.toggle_extrude_tool()
-			elif 120 < x and x < 350 and 220 < y and y < 240:
+			elif 120 < x and x < 350 and 180 < y and y < 240:
 				self.toggle_change_colour()
 			elif 120 < x and x < 350 and 240 < y and y < 260:
 				self.toggle_shading()
+			elif 120 < x and x < 350 and 270 < y and y < 290:
+				self.toggle_faces()
+			elif 120 < x and x < 350 and 300 < y and y < 320:
+				self.toggle_edges()
 
 	def selector(self):
 
@@ -252,5 +270,23 @@ class Toolbar:
 			self.shading_flag = False
 		else:
 			self.shading_flag = True
+
+	def toggle_faces(self):
+
+		print("Toggle Faces")
+
+		if self.faces_flag:
+			self.faces_flag = False
+		else:
+			self.faces_flag = True
+
+	def toggle_edges(self):
+
+		if self.edges_flag:
+			self.edges_flag = False
+		else:
+			self.edges_flag = True
+
+
 		
 

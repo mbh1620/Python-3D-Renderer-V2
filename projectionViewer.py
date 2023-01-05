@@ -35,7 +35,7 @@ class ProjectionViewer:
 
 		self.displayNodes = True
 		self.displayEdges = True
-		self.displayFaces = True
+		self.displayFaces = False
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
 		self.nodeRadius = 2
@@ -117,6 +117,15 @@ class ProjectionViewer:
 						self.toolbar.change_colour_flag = False
 				
 				elif event.type == pygame.MOUSEBUTTONUP:
+					if self.toolbar.faces_flag == True:
+						self.displayFaces = True
+					elif self.toolbar.faces_flag == False:
+						self.displayFaces = False
+
+					if self.toolbar.edges_flag == True:
+						self.displayEdges = True
+					elif self.toolbar.edges_flag == False:
+						self.displayEdges = False
 
 					if self.toolbar.draw_rectangle_flag == True:
 						self.toolbar.view_flag = False
@@ -436,7 +445,7 @@ class ProjectionViewer:
 			self.displayNodes = True
 
 
-	def open_file(self, filename=None, showWireframeFaces=True, showWireframeEdges=False):
+	def open_file(self, filename=None, showWireframeFaces=True, showWireframeEdges=True):
 
 		if filename == None:
 			self.root = tk.Tk()
@@ -656,6 +665,16 @@ class ProjectionViewer:
 		if self.toolbar.view_model_flag:
 			self.toolbar.view_model_flag = False
 			self.view_model_window()
+
+		if self.toolbar.faces_flag == True:
+			self.displayFaces = True
+		elif self.toolbar.faces_flag == False:
+			self.displayFaces = False
+
+		if self.toolbar.edges_flag == True:
+			self.displayEdges = True
+		elif self.toolbar.edges_flag == False:
+			self.displayEdges = False
 
 		if self.toolbar.grid_flag == True:
 				
