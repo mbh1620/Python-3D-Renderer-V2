@@ -38,13 +38,15 @@ class ProjectionViewer:
 		self.displayFaces = False
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
-		self.nodeRadius = 2
+		self.nodeRadius = 3
 
 		self.toolbar = Toolbar(self.screen, self.width)
 
 		self.first_click = None
 		self.second_click = None
 		self.converted_clicks = []
+
+		self.render_flag = False
 
 		self.shading = True
 
@@ -69,6 +71,9 @@ class ProjectionViewer:
 		flag = False
 
 		while running:
+
+			if self.render_flag == True:
+				self.connected_node_click_function(self.first_click, pygame.mouse.get_pos())
 
 			keys = pygame.key.get_pressed()
 
@@ -117,16 +122,22 @@ class ProjectionViewer:
 						self.toolbar.change_colour_flag = False
 				
 				elif event.type == pygame.MOUSEBUTTONUP:
-					if self.toolbar.faces_flag == True:
-						self.displayFaces = True
-					elif self.toolbar.faces_flag == False:
-						self.displayFaces = False
 
-					if self.toolbar.edges_flag == True:
-						self.displayEdges = True
-					elif self.toolbar.edges_flag == False:
-						self.displayEdges = False
+					if self.toolbar.measure_tool_flag == True:
+						print("first measure click")
 
+						if self.first_click == None:
+							self.first_click = pygame.mouse.get_pos()
+							self.click_function(self.first_click)
+							self.render_flag = True
+						else:
+							self.render_flag = False
+							self.second_click = pygame.mouse.get_pos()
+							self.connected_node_click_function(self.first_click, self.second_click)
+							self.first_click = None
+							self.second_click = None
+
+					
 					if self.toolbar.draw_rectangle_flag == True:
 						self.toolbar.view_flag = False
 
@@ -141,6 +152,7 @@ class ProjectionViewer:
 							self.toolbar.draw_rectangle_flag = False
 							self.first_click = None
 							self.second_click = None
+							
 
 					if self.toolbar.draw_circle_flag == True:
 						self.toolbar.view_flag = False
@@ -445,7 +457,7 @@ class ProjectionViewer:
 			self.displayNodes = True
 
 
-	def open_file(self, filename=None, showWireframeFaces=True, showWireframeEdges=True):
+	def open_file(self, filename=None, showWireframeFaces=True, showWireframeEdges=True, showWireframeNodes=True):
 
 		if filename == None:
 			self.root = tk.Tk()
@@ -463,6 +475,7 @@ class ProjectionViewer:
 
 		model_wf.showFaces = showWireframeFaces
 		model_wf.showEdges = showWireframeEdges
+		model_wf.showNodes = showWireframeNodes
 
 		self.addWireframe(str(file_path.split("/")[-1])+str(len(self.wireframes)), model_wf)
 
@@ -658,6 +671,27 @@ class ProjectionViewer:
 
 		self.addWireframe('clickNode'+str(len(self.wireframes.keys())), click_node)
 
+	def connected_node_click_function(self, position1, position2):
+
+		connected_nodes = Wireframe()
+
+		convertedNode1 = self.convertNode(position1)
+		node1 = np.array([[convertedNode1[0], convertedNode1[1], convertedNode1[2]]])
+		connected_nodes.addNodes(node1)
+
+		convertedNode2 = self.convertNode(position2)
+		node2 = np.array([[convertedNode2[0], convertedNode2[1], convertedNode2[2]]])
+		connected_nodes.addNodes(node2)
+
+		connected_nodes.addEdges([(0,1)])
+
+		connected_nodes.showNodes = True
+		connected_nodes.showEdges = True
+
+		self.addWireframe('measureToolWireframe',connected_nodes)
+
+
+
 	def flag_detection(self):
 		if self.toolbar.open_flag == True:
 			self.open_file()
@@ -675,6 +709,11 @@ class ProjectionViewer:
 			self.displayEdges = True
 		elif self.toolbar.edges_flag == False:
 			self.displayEdges = False
+
+		if self.toolbar.nodes_flag == True:
+			self.displayNodes = True
+		elif self.toolbar.nodes_flag == False:
+			self.displayNodes = False
 
 		if self.toolbar.grid_flag == True:
 				

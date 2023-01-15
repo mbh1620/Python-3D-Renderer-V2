@@ -21,6 +21,7 @@ class Toolbar:
 		self.shading_flag = True
 		self.faces_flag = False
 		self.edges_flag = True
+		self.nodes_flag = True
 
 		self.grid_flag = True
 		self.extrude_flag = False
@@ -148,6 +149,12 @@ class Toolbar:
 		textRect.center = (200, 310)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font('freesansbold.ttf', 20)
+		text = font.render(f'Toggle Nodes', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 340)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
@@ -208,6 +215,9 @@ class Toolbar:
 				self.toggle_faces()
 			elif 120 < x and x < 350 and 300 < y and y < 320:
 				self.toggle_edges()
+			elif 120 < x and x < 350 and 330 < y and y < 360:
+				self.toggle_nodes()
+
 
 	def selector(self):
 
@@ -286,6 +296,15 @@ class Toolbar:
 			self.edges_flag = False
 		else:
 			self.edges_flag = True
+
+	def toggle_nodes(self):
+
+		print("Toggle Nodes")
+
+		if self.nodes_flag:
+			self.nodes_flag = False
+		else:
+			self.nodes_flag = True
 
 
 		
