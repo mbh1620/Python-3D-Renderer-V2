@@ -1,4 +1,5 @@
 import pygame
+import os, sys
 
 
 class Toolbar:
@@ -19,17 +20,23 @@ class Toolbar:
 		self.draw_polygon_flag = False
 		self.change_colour_flag = False
 		self.shading_flag = True
-		self.faces_flag = False
+		self.faces_flag = True
 		self.edges_flag = True
 		self.nodes_flag = True
+		self.render_flag = False
 
 		self.grid_flag = True
 		self.extrude_flag = False
 
+		if getattr(sys, 'frozen', False):
+			self.application_path = sys._MEIPASS
+		else:
+			self.application_path = os.path.dirname(os.path.abspath(__file__))
+
 	def render(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(0,0,self.width, 30))
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'File    Edit    View', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (100, 15)
@@ -47,22 +54,28 @@ class Toolbar:
 	def file(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(0,30,200, 250))
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Open File', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (60, 50)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Add Light', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (60, 75)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Render to Image', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (90, 100)
+		self.screen.blit(text, textRect)
+
 	def edit(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(60,30,200, 250))
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Hello', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (100, 50)
@@ -71,85 +84,85 @@ class Toolbar:
 	def view(self):
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(120,30,200, 250))
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'View Models', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 50)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Floor Grid √', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 70)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Measure Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 90)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Draw Rectangle Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 110)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Draw Polygon Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 130)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Draw Circle Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 150)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Extrude Tool', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 170)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Copy Mesh Object', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 190)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Translate Object', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 210)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Change Object Colour', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 230)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Toggle Shading', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 250)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Toggle Faces', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 280)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Toggle Edges', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 310)
 		self.screen.blit(text, textRect)
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'Toggle Nodes', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (200, 340)
@@ -186,6 +199,8 @@ class Toolbar:
 		if self.file_flag:
 			if 0 < x and x < 120 and 30 < y and y < 70:
 				self.open()
+			if 0 < x and x < 120 and 70 < y and y < 110:
+				self.renderToImage()
 
 		if self.edit_flag:
 			if 0 < x and x < 120 and 30 < y and y < 70:
@@ -232,7 +247,7 @@ class Toolbar:
 		elif self.extrude_flag == True:
 			selector_distance = 150
 
-		font = pygame.font.Font('freesansbold.ttf', 20)
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
 		text = font.render(f'√', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
 		textRect.center = (310, selector_distance)
@@ -246,6 +261,10 @@ class Toolbar:
 	def open(self):
 
 		self.open_flag = True
+		self.file_flag = False
+
+	def renderToImage(self):
+		self.render_flag = True
 		self.file_flag = False
 
 	def toggle_grid(self):

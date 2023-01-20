@@ -11,6 +11,8 @@ from tkinter import filedialog
 from tkinter.colorchooser import askcolor
 from Functions.pointInTriangle import pointInTriangle
 from Classes.Face import Face
+import matplotlib.pyplot as plt
+from PIL import Image
 
 class ProjectionViewer:
 
@@ -35,7 +37,7 @@ class ProjectionViewer:
 
 		self.displayNodes = True
 		self.displayEdges = True
-		self.displayFaces = False
+		self.displayFaces = True
 		self.nodeColour = (255,255,255)
 		self.edgeColour = (200,200,200)
 		self.nodeRadius = 3
@@ -124,7 +126,6 @@ class ProjectionViewer:
 				elif event.type == pygame.MOUSEBUTTONUP:
 
 					if self.toolbar.measure_tool_flag == True:
-						print("first measure click")
 
 						if self.first_click == None:
 							self.first_click = pygame.mouse.get_pos()
@@ -696,6 +697,11 @@ class ProjectionViewer:
 		if self.toolbar.open_flag == True:
 			self.open_file()
 			self.toolbar.open_flag = False
+
+		if self.toolbar.render_flag == True:
+			self.outputToPhoto()
+			self.toolbar.render_flag = False
+
 		if self.toolbar.view_model_flag:
 			self.toolbar.view_model_flag = False
 			self.view_model_window()
@@ -973,10 +979,96 @@ class ProjectionViewer:
 
 					pygame.draw.circle(self.screen, colour, (int(x), int(y)), 0, 0)
 
+	def rasterTriangleForImage(self, p1, p2, p3, image_array):
+
+		p1x, p1y = p1
+		p2x, p2y = p2
+		p3x, p3y = p3
+
+		x_coordinates = [p1x,p2x,p3x]
+		y_coordinates = [p1y,p2y,p3y]
+
+		boundary_x = [min(x_coordinates), max(x_coordinates)]
+		boundary_y = [min(y_coordinates), max(y_coordinates)]
+
+		outputTriangle = []
+
+		for x in np.arange(boundary_x[0], boundary_x[1]+1, 1):
+			for y in np.arange(boundary_y[0], boundary_y[1]+1, 1):
+				
+				point = [x, y]
+				n1 = [p1x, p1y]
+				n2 = [p2x, p2y]
+				n3 = [p3x, p3y]
+
+				if pointInTriangle(point, n1, n2, n3) == True:
+
+					outputTriangle.append([int(x),int(y)]) 
+
+		return outputTriangle
+
+	def outputToPhoto(self):
+
+		height = 1400
+		width = 1400
+
+		channel = 3
+
+		img_numpy = np.zeros((height, width, channel), dtype=np.uint8)
+		imagenodes = []
+
+		file_path = filedialog.asksaveasfilename(defaultextension='.png')
+
+		for wireframe in self.wireframes.values():
+			wireframe.transform_for_perspective((self.width/2, self.height/2), self.camera.fov, self.camera.zoom)	
+			
+			for node in wireframe.perspective_nodes:
+				if self.displayFaces and wireframe.showFaces:
+					if node[2] > 0 and node[2] < 10000 and node[0] > 0 and node[0] < 1199:
+							print()
+							img_numpy[int(node[1])][int(node[0])] = [255,255,255]
 
 
+			for face in wireframe.faces:
+				if self.displayFaces and wireframe.showFaces:
 
+					n1, n2, n3 = face.vertices
+					clipN1 = self.clipNode(wireframe.perspective_nodes[n1]) 
+					clipN2 = self.clipNode(wireframe.perspective_nodes[n2])
+					clipN3 = self.clipNode(wireframe.perspective_nodes[n3])
 
+					if type(clipN1) == int or type(clipN2) == int or type(clipN3) == int:
+						pass
+					else:
+
+						cull = self.backFaceCull(clipN1, clipN2, clipN3)
+						if cull:
+							pass
+						else:
+
+							if self.toolbar.shading_flag == True:
+								colour = [self.processLighting(face) * x for x in face.material]
+							else:
+								colour = [x for x in face.material]
+								
+							if math.isnan(colour[0]):
+								colour = [70,70,70]
+
+							triangle = self.rasterTriangleForImage(clipN1[:2], clipN2[:2], clipN3[:2], img_numpy)
+
+							for i in range(0, len(triangle)):
+
+								img_numpy[int(triangle[i][1])][int(triangle[i][0])] = colour
+				else:
+					pass
+
+		#soften
+											
+		print("output")
+		
+		img = Image.fromarray(img_numpy, "RGB")
+
+		img.save(file_path)
 
 
 
