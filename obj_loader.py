@@ -27,81 +27,94 @@ class OBJ_loader:
 
 	def process_file(self, mtlFile):
 
-		f = open(self.filename, "r")
+		#Work out the File type
 
-		if len(self.materialDictionary.keys()) == 0:
-			self.materialDictionary['default'] = (255,255,255)
+		filetype = self.filename.split('.')[-1]
 
-		material = ''
+		print(filetype)
 
-		for i in f:
+		if filetype == "tri":
 
-			if i[0] == 'v' and i[1] == 't':
-				pass
+			self.process_proprietary_file()
 
-			elif i[0] == 'v' and i[1] == 'n':
-				i = i.split()
-				self.vertexNormalArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
+		else:
 
-			elif i[0] == 'v' and i[1] == ' ':
-				i = i.split()
-				self.nodeArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
 
-			elif i.find('usemtl') != -1:
-				if mtlFile == False:
-					material = 'default'
-				else:
-					i = i.split(' ')
-					material = i[1]
+			f = open(self.filename, "r")
 
-			elif i[0] == 'f':
+			if len(self.materialDictionary.keys()) == 0:
+				self.materialDictionary['default'] = (255,255,255)
 
-				i = i.split()
-				face = []
-				faceVertexNormals = []
-				for subsection in i:
-					subsections = subsection.split('/')
-					if subsections[0] != 'f':
-						face.append(subsections[0])
-						faceVertexNormals.append(subsections[2])
-				if len(face) == 4:
-						#Create two triangles
-					triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
-					triangle2 = Face((int(face[2])-1, int(face[3])-1, int(face[0])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[2])-1], self.vertexNormalArray[int(faceVertexNormals[3])-1], self.vertexNormalArray[int(faceVertexNormals[0])-1]), self.materialDictionary[material])
+			material = ''
 
-					self.edgeArray.append((int(face[0])-1, int(face[1])-1))
-					self.edgeArray.append((int(face[1])-1, int(face[2])-1))
-					self.edgeArray.append((int(face[2])-1, int(face[0])-1))
-					self.edgeArray.append((int(face[2])-1, int(face[3])-1))
-					self.edgeArray.append((int(face[3])-1, int(face[0])-1))
-					self.edgeArray.append((int(face[0])-1, int(face[2])-1))
+			for i in f:
 
-					self.faceArray.append(triangle1)
-					self.faceArray.append(triangle2)
-				elif len(face) == 3:
-						#Create one triangle
-					triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
-					self.edgeArray.append((int(face[0])-1, int(face[1])-1))
-					self.edgeArray.append((int(face[1])-1, int(face[2])-1))
-					self.edgeArray.append((int(face[2])-1, int(face[0])-1))
-					self.faceArray.append(triangle1)
+				if i[0] == 'v' and i[1] == 't':
+					pass
+
+				elif i[0] == 'v' and i[1] == 'n':
+					i = i.split()
+					self.vertexNormalArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
+
+				elif i[0] == 'v' and i[1] == ' ':
+					i = i.split()
+					self.nodeArray.append([(float(i[1])*self.scaleFactor), (float(i[2])*self.scaleFactor), (float(i[3])*self.scaleFactor)])
+
+				elif i.find('usemtl') != -1:
+					if mtlFile == False:
+						material = 'default'
+					else:
+						i = i.split(' ')
+						material = i[1]
+
+				elif i[0] == 'f':
+
+					i = i.split()
+					face = []
+					faceVertexNormals = []
+					for subsection in i:
+						subsections = subsection.split('/')
+						if subsections[0] != 'f':
+							face.append(subsections[0])
+							faceVertexNormals.append(subsections[2])
+					if len(face) == 4:
+							#Create two triangles
+						triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
+						triangle2 = Face((int(face[2])-1, int(face[3])-1, int(face[0])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[2])-1], self.vertexNormalArray[int(faceVertexNormals[3])-1], self.vertexNormalArray[int(faceVertexNormals[0])-1]), self.materialDictionary[material])
+
+						self.edgeArray.append((int(face[0])-1, int(face[1])-1))
+						self.edgeArray.append((int(face[1])-1, int(face[2])-1))
+						self.edgeArray.append((int(face[2])-1, int(face[0])-1))
+						self.edgeArray.append((int(face[2])-1, int(face[3])-1))
+						self.edgeArray.append((int(face[3])-1, int(face[0])-1))
+						self.edgeArray.append((int(face[0])-1, int(face[2])-1))
+
+						self.faceArray.append(triangle1)
+						self.faceArray.append(triangle2)
+					elif len(face) == 3:
+							#Create one triangle
+						triangle1 = Face((int(face[0])-1, int(face[1])-1, int(face[2])-1), self.getFaceNormal(self.vertexNormalArray[int(faceVertexNormals[0])-1], self.vertexNormalArray[int(faceVertexNormals[1])-1], self.vertexNormalArray[int(faceVertexNormals[2])-1]), self.materialDictionary[material])
+						self.edgeArray.append((int(face[0])-1, int(face[1])-1))
+						self.edgeArray.append((int(face[1])-1, int(face[2])-1))
+						self.edgeArray.append((int(face[2])-1, int(face[0])-1))
+						self.faceArray.append(triangle1)
+
+					else:
+						pass
+
+				elif i[0] == 'm':
+					#use material to add the colour to the face
+					pass
+
+				elif i[0] == 'l':
+
+					i = i.split()
+					self.edgeArray.append((int(i[1])-1, int(i[2])-1))
 
 				else:
 					pass
 
-			elif i[0] == 'm':
-				#use material to add the colour to the face
-				pass
-
-			elif i[0] == 'l':
-
-				i = i.split()
-				self.edgeArray.append((int(i[1])-1, int(i[2])-1))
-
-			else:
-				pass
-
-		f.close()
+			f.close()
 
 	def getFaceNormal(self, vertexNormalA, vertexNormalB, vertexNormalC):
 
@@ -123,8 +136,6 @@ class OBJ_loader:
 		averagedVertexNormal[0] = averagedVertexNormal[0] / bottom
 		averagedVertexNormal[1] = averagedVertexNormal[1] / bottom
 		averagedVertexNormal[2] = averagedVertexNormal[2] / bottom
-
-		print(str(averagedVertexNormal[0]) + " " + str(averagedVertexNormal[1]) + " " + str(averagedVertexNormal[0]))
 
 		return averagedVertexNormal
 
@@ -164,8 +175,49 @@ class OBJ_loader:
 
 		return mtlFile
 
-				
-				
+	def process_proprietary_file(self):
+
+		f = open(self.filename, "r")
+
+		f.seek(2)
+
+		header = f.readline()
+
+		numberOfVertices = header.split()[0]
+
+		print("start reading tri file here")
+
+		print(numberOfVertices)
+
+		for i in range(0,int(numberOfVertices)):
+
+			line = f.readline()
+
+			line = line.split()
+
+			self.nodeArray.append([(float(line[1])*self.scaleFactor), (float(line[2])*self.scaleFactor), (float(line[3])*self.scaleFactor)])
+
+		#For now generate the nodes to see what they look like
+
+		numberOfTriangles = f.readline()
+		
+		print(numberOfTriangles.split)
+
+		for i in range(0, int(numberOfTriangles.split()[0])):
+
+			line = f.readline()
+
+			line = line.split()
+
+			self.edgeArray.append((int(line[1]), int(line[2])))
+			self.edgeArray.append((int(line[2]), int(line[3])))
+			self.edgeArray.append((int(line[3]), int(line[1])))
+
+			triangle1 = Face((int(line[1]), int(line[2]), int(line[3])), [1,1,1], (100,100,100))
+
+			self.faceArray.append(triangle1)
+
+
 	def create_wireframe(self):
 
 		Object = wireframe.Wireframe()

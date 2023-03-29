@@ -49,7 +49,8 @@ class ProjectionViewer:
 		self.converted_clicks = []
 
 		self.render_flag = False
-
+		self.render_flag_2 = False
+		self.render_flag_3 = False
 		self.shading = True
 
 		pygame.init()
@@ -76,6 +77,12 @@ class ProjectionViewer:
 
 			if self.render_flag == True:
 				self.connected_node_click_function(self.first_click, pygame.mouse.get_pos())
+
+			if self.render_flag_2 == True:
+				self.create_rectangle_wireframe_lines(self.first_click,pygame.mouse.get_pos())
+
+			if self.render_flag_3 == True:
+				self.create_circle_wireframe_lines(self.first_click, pygame.mouse.get_pos())
 
 			keys = pygame.key.get_pressed()
 
@@ -138,14 +145,15 @@ class ProjectionViewer:
 							self.first_click = None
 							self.second_click = None
 
-					
 					if self.toolbar.draw_rectangle_flag == True:
 						self.toolbar.view_flag = False
 
 						if self.first_click == None:
 							self.first_click = pygame.mouse.get_pos()
 							self.click_function(self.first_click)
+							self.render_flag_2 = True
 						else:
+							self.render_flag_2 = False
 							self.second_click = pygame.mouse.get_pos()
 							self.click_function(self.second_click)
 							self.create_rectangle_wireframe(self.first_click,self.second_click)
@@ -154,14 +162,15 @@ class ProjectionViewer:
 							self.first_click = None
 							self.second_click = None
 							
-
 					if self.toolbar.draw_circle_flag == True:
 						self.toolbar.view_flag = False
 
 						if self.first_click == None:
 							self.first_click = pygame.mouse.get_pos()
 							self.click_function(self.first_click)
+							self.render_flag_3 = True
 						else:
+							self.render_flag_3 = False
 							self.second_click = pygame.mouse.get_pos()
 							self.click_function(self.second_click)
 							self.create_circle_wireframe(self.first_click, self.second_click)
@@ -196,7 +205,6 @@ class ProjectionViewer:
 
 			self.display()
 			self.toolbar.render()
-
 			self.flag_detection()
 				
 			pygame.display.flip()
@@ -549,6 +557,22 @@ class ProjectionViewer:
 		
 		self.addWireframe('drawnRectangle'+str(len(self.wireframes.keys())), rectangleWf)
 
+	def create_rectangle_wireframe_lines(self, first_click, second_click):
+
+		rectangleWf = Wireframe()
+		converted_first_click = self.convertNode(first_click)
+		converted_second_click = self.convertNode(second_click)
+
+		nodes = np.array([[converted_first_click[0], converted_first_click[1], converted_first_click[2]], [converted_first_click[0], converted_first_click[1], converted_second_click[2]], [converted_second_click[0], converted_second_click[1], converted_second_click[2]], [converted_second_click[0], converted_second_click[1], converted_first_click[2]]])
+		rectangleWf.addNodes(nodes)
+
+		rectangleWf.addEdges([(0,1),(1,2),(2,3),(3,0)])
+
+		rectangleWf.showEdges = True
+		rectangleWf.showNodes = False
+
+		self.addWireframe('drawnRectangle', rectangleWf)
+
 	def polygon_clicker(self, click):
 
 		node = self.convertNode(click)
@@ -599,6 +623,57 @@ class ProjectionViewer:
 		polygonWf.showEdges = True
 
 		self.addWireframe('polygon'+str(len(self.wireframes.keys())), polygonWf)
+
+	def create_circle_wireframe_lines(self, center_point, radius_point):
+
+		world_center_point = self.convertNode(center_point)
+		world_radius_point = self.convertNode(radius_point)
+
+		radius = math.sqrt(((world_radius_point[0]-world_center_point[0])**2)+(world_radius_point[2]-world_center_point[2])**2)
+
+		number_of_points_at_edge=30
+
+		degree_intervals = 360/number_of_points_at_edge
+
+		theta = 0 
+
+		circle_points = []
+		circle_edges = []
+		circle_faces = []
+		fNormals = []
+		fNormal = [0,1,-1]
+
+		circle_points.append(world_center_point)
+
+		for i in range(0,number_of_points_at_edge):
+
+			x = world_center_point[0] + (radius * math.cos((theta/360)*2*math.pi))
+			y = 0
+			z = world_center_point[2] + (radius * math.sin((theta/360)*2*math.pi))
+			theta += degree_intervals
+
+			if i <= number_of_points_at_edge:
+				if i == 0:
+					pass
+				else:
+					circle_edges.append((i, i+1))
+					
+
+			circle_points.append([x, y, z])
+
+		circle_edges.append((number_of_points_at_edge-1, 1))
+
+		circle_wireframe = Wireframe()
+
+		circle_wireframe.type = "Circle"
+
+		circle_wireframe.addNodes(np.array(circle_points))
+		circle_wireframe.addEdges(circle_edges)
+
+		circle_wireframe.showFaces = False
+		circle_wireframe.showEdges = True
+
+		self.addWireframe('circle_wireframe', circle_wireframe)
 
 	def create_circle_wireframe(self, center_point, radius_point):
 
@@ -690,8 +765,6 @@ class ProjectionViewer:
 		connected_nodes.showEdges = True
 
 		self.addWireframe('measureToolWireframe',connected_nodes)
-
-
 
 	def flag_detection(self):
 		if self.toolbar.open_flag == True:
@@ -988,8 +1061,8 @@ class ProjectionViewer:
 		x_coordinates = [p1x,p2x,p3x]
 		y_coordinates = [p1y,p2y,p3y]
 
-		boundary_x = [min(x_coordinates), max(x_coordinates)]
-		boundary_y = [min(y_coordinates), max(y_coordinates)]
+		boundary_x = [min(x_coordinates)-2, max(x_coordinates)+2]
+		boundary_y = [min(y_coordinates)-2, max(y_coordinates)+2]
 
 		outputTriangle = []
 
@@ -1006,6 +1079,11 @@ class ProjectionViewer:
 					outputTriangle.append([int(x),int(y)]) 
 
 		return outputTriangle
+
+	def rasterLine(self, p1, p2):
+
+		pass
+
 
 	def outputToPhoto(self):
 
@@ -1058,24 +1136,26 @@ class ProjectionViewer:
 
 							for i in range(0, len(triangle)):
 
+								# print(len(triangle))
+
+								r = 120
+								g = 200
+								b = 100
+
 								img_numpy[int(triangle[i][1])][int(triangle[i][0])] = colour
 				else:
 					pass
-
-		#soften
 											
 		print("output")
+
+		#produce a blur effect
+		for i in img_numpy:
+			print(i)
+
 		
 		img = Image.fromarray(img_numpy, "RGB")
 
 		img.save(file_path)
-
-
-
-
-
-		
-
 
 		
 

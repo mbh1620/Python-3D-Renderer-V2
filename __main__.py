@@ -8,7 +8,6 @@ from Classes.Light import Light
 import sys
 
 import tkinter as tk
-
 from tkinter import filedialog
 
 root = tk.Tk()
@@ -35,7 +34,7 @@ grid= OBJ_loader(application_path + '/Assets/grid.obj' , 50)
 
 ball= OBJ_loader(application_path + '/Assets/ball.obj' , 50)
 
-# planeCreator= OBJ_loader('./Assets/cube.obj' , 100)
+planeCreator= OBJ_loader('./Assets/cube.obj' , 100)
 
 center_point = wireframe.Wireframe()
 
