@@ -16,6 +16,9 @@ class Wireframe:
 		self.showEdges = False
 		self.showFaces = True
 
+		self.doubledNodes = False
+		self.originalNumberOfNodes = None
+
 	def addNodes(self, node_array):
 
 		ones_column = np.ones((len(node_array), 1))

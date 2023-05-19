@@ -599,6 +599,8 @@ class ProjectionViewer:
 
 		polygonWf.addNodes(np.array(clicks))
 
+
+
 		edge_list = []
 		polygon_face_list = []
 
@@ -621,6 +623,8 @@ class ProjectionViewer:
 
 		polygonWf.showNodes = True
 		polygonWf.showEdges = True
+
+		print(len(polygonWf.nodes))
 
 		self.addWireframe('polygon'+str(len(self.wireframes.keys())), polygonWf)
 
@@ -857,6 +861,9 @@ class ProjectionViewer:
 		matrix = wf.translationMatrix(0, -delta, 0)
 
 		if len(wireframe.nodes) == 4:
+
+			console.log("Wireframe has four nodes")
+
 			face_node_array = np.array([wireframe.nodes[0][0:-1], wireframe.nodes[1][0:-1], wireframe.nodes[2][0:-1], wireframe.nodes[3][0:-1]])
 			
 			print(face_node_array)
@@ -954,18 +961,56 @@ class ProjectionViewer:
 				i.fNormal = self.generate_face_normal(facePoints)
 
 		else:
-			wireframe.nodes[0][1] += -delta
-			wireframe.nodes[1][1] += -delta
-			wireframe.nodes[2][1] += -delta
-			wireframe.nodes[3][1] += -delta
+
+
+			print("extruding polygon")
+			print("number of nodes: ")
+
+			#Create a copy of nodes before adding delta 
+
+			
+
+			if wireframe.doubledNodes == False:
+				wireframe.originalNumberOfNodes = int(len(wireframe.nodes))
+
+				shapeCount = wireframe.originalNumberOfNodes
+
+				wireframe.nodes = np.concatenate((wireframe.nodes, wireframe.nodes))
+
+				edgeList = []
+
+				for i in range(0, shapeCount-1):
+
+					a = Face((i+1, i+shapeCount, i), [0,1,0], (211,211,211))
+					b = Face((i+1, i+shapeCount+1, i+shapeCount), [0,1,0], (211,211,211))
+
+					wireframe.addFaces([a,b])
+
+					edgeList.append((i, i+1))
+
+				a = Face((shapeCount-1, 0, shapeCount), [0,1,0], (211,211,211))
+				b = Face((shapeCount, len(wireframe.nodes)-1, shapeCount-1), [0,1,0], (211,211,211))
+
+				wireframe.addFaces([a,b])
+
+				wireframe.addEdges(edgeList)
+
+				wireframe.doubledNodes = True
+
+			for i in range(0,wireframe.originalNumberOfNodes):
+
+				wireframe.nodes[i][1] += -delta
 
 			for i in wireframe.faces:
 
 				p1, p2, p3 = i.vertices
 						
-				facePoints = wireframe.nodes[p1], wireframe.nodes[p2], wireframe.nodes[p3]
+				# facePoints = wireframe.nodes[p1], wireframe.nodes[p2], wireframe.nodes[p3]
 
-				i.fNormal = self.generate_face_normal(facePoints)
+				# i.fNormal = self.generate_face_normal(facePoints)
+
+			wireframe.showEdges = True
+			wireframe.showFaces = True
 
 
 
