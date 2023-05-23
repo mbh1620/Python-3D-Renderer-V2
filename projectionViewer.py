@@ -53,6 +53,8 @@ class ProjectionViewer:
 		self.render_flag_3 = False
 		self.shading = True
 
+		#At some point collapse flags into a dictionary
+
 		pygame.init()
 
 	def run(self):
@@ -131,6 +133,17 @@ class ProjectionViewer:
 						self.toolbar.change_colour_flag = False
 				
 				elif event.type == pygame.MOUSEBUTTONUP:
+
+					if self.toolbar.copy_flag == True:
+
+						start_position = pygame.mouse.get_pos()
+
+						wireframe = self.selectFace(start_position)
+
+						self.copy_wireframe(wireframe)
+
+						self.toolbar.copy_flag = False
+
 
 					if self.toolbar.measure_tool_flag == True:
 
@@ -599,8 +612,6 @@ class ProjectionViewer:
 
 		polygonWf.addNodes(np.array(clicks))
 
-
-
 		edge_list = []
 		polygon_face_list = []
 
@@ -862,7 +873,7 @@ class ProjectionViewer:
 
 		if len(wireframe.nodes) == 4:
 
-			console.log("Wireframe has four nodes")
+			print("Wireframe has four nodes")
 
 			face_node_array = np.array([wireframe.nodes[0][0:-1], wireframe.nodes[1][0:-1], wireframe.nodes[2][0:-1], wireframe.nodes[3][0:-1]])
 			
@@ -962,14 +973,12 @@ class ProjectionViewer:
 
 		else:
 
-
 			print("extruding polygon")
 			print("number of nodes: ")
 
 			#Create a copy of nodes before adding delta 
 
 			
-
 			if wireframe.doubledNodes == False:
 				wireframe.originalNumberOfNodes = int(len(wireframe.nodes))
 
@@ -1012,8 +1021,6 @@ class ProjectionViewer:
 			wireframe.showEdges = True
 			wireframe.showFaces = True
 
-
-
 	def change_wireframe_colour(self,wireframe):
 
 		colour = askcolor(title="Choose Colour for Object")
@@ -1024,6 +1031,26 @@ class ProjectionViewer:
 
 		for face in wireframe.faces:
 			face.material = rgb
+
+	def copy_wireframe(self, wireframe):
+
+		wf = Wireframe()
+
+		wf2 = Wireframe()
+
+		matrix = wf2.translationMatrix(*[-500, 0, 0])
+
+		wf.nodes = wireframe.nodes
+		wf.edges = wireframe.edges
+		wf.faces = wireframe.faces
+
+		wf.transform(matrix)
+
+		wf.showEdges = False
+		wf.showFaces = True
+		wf.showEdges = True
+
+		self.wireframes[f'copied-wireframe'] = wf
 
 	def generate_face_normal(self, face):
 

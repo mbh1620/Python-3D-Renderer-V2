@@ -11,6 +11,7 @@ class Toolbar:
 		self.file_flag = False
 		self.edit_flag = False
 		self.view_flag = False
+		self.circuit_flag = False
 
 		self.open_flag = False
 		self.view_model_flag = False
@@ -28,6 +29,11 @@ class Toolbar:
 		self.grid_flag = True
 		self.extrude_flag = False
 
+		self.copy_flag = False
+		self.move_flag = False
+
+		#Collapse all flags down into a single dictionary
+
 		if getattr(sys, 'frozen', False):
 			self.application_path = sys._MEIPASS
 		else:
@@ -37,9 +43,9 @@ class Toolbar:
 		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(0,0,self.width, 30))
 
 		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
-		text = font.render(f'File    Edit    View', True, (255,255,255),(161, 161, 161))
+		text = font.render(f'File    Edit    View    Circuit Simulation    Architecture', True, (255,255,255),(161, 161, 161))
 		textRect = text.get_rect()
-		textRect.center = (100, 15)
+		textRect.center = (280, 15)
 		self.screen.blit(text, textRect)
 
 		if self.file_flag:
@@ -48,6 +54,8 @@ class Toolbar:
 			self.edit()
 		if self.view_flag:
 			self.view()
+		if self.circuit_flag:
+			self.circuitSimulation()
 
 		self.selector()
 
@@ -168,12 +176,71 @@ class Toolbar:
 		textRect.center = (200, 340)
 		self.screen.blit(text, textRect)
 
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Copy Mesh', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 370)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Move Mesh', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 400)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Delete Mesh', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (200, 430)
+		self.screen.blit(text, textRect)
+
+	def circuitSimulation(self):
+
+		pygame.draw.rect(self.screen, (161, 161, 161), pygame.Rect(200,30,200, 250))
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Build Circuit', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (300, 60)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Add Wire', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (300, 90)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Add DC Power Source', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (300, 120)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Add AC Power Source', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (300, 150)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Add Ground Node', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (300, 180)
+		self.screen.blit(text, textRect)
+
+		font = pygame.font.Font(self.application_path + '/Fonts/freesansbold.ttf', 20)
+		text = font.render(f'Probe Tool', True, (255,255,255),(161, 161, 161))
+		textRect = text.get_rect()
+		textRect.center = (300, 210)
+		self.screen.blit(text, textRect)
+
 	def process_click(self, cursor_position):
 		x, y = cursor_position
 		# print(x, y)
 		#File
 		if 0 < x and x < 60 and 0 < y and y < 30:
 			if self.file_flag == False:
+				self.circuit_flag = False
 				self.file_flag = True
 				self.edit_flag = False
 				self.view_flag = False
@@ -182,6 +249,7 @@ class Toolbar:
 
 		elif 60 < x and x < 120 and 0 < y and y < 30:
 			if self.edit_flag == False:
+				self.circuit_flag = False
 				self.edit_flag = True
 				self.file_flag = False
 				self.view_flag = False
@@ -190,11 +258,22 @@ class Toolbar:
 
 		elif 120 < x and x < 180 and 0 < y and y < 30:
 			if self.view_flag == False:
+				self.circuit_flag = False
 				self.edit_flag = False
 				self.file_flag = False
 				self.view_flag = True
 			else:
 				self.view_flag = False
+
+		elif 180 < x and x < 400 and 0 < y and y < 30:
+			if self.circuit_flag == False:
+				self.edit_flag = False
+				self.file_flag = False
+				self.view_flag = False
+				self.circuit_flag = True
+			else:
+				self.circuit_flag = False
+
 
 		if self.file_flag:
 			if 0 < x and x < 120 and 30 < y and y < 70:
@@ -232,6 +311,14 @@ class Toolbar:
 				self.toggle_edges()
 			elif 120 < x and x < 350 and 330 < y and y < 360:
 				self.toggle_nodes()
+			elif 120 < x and x < 350 and 360 < y and y < 390:
+				self.toggle_copy()
+			elif 120 < x and x < 350 and 420 < y and y < 450:
+				self.toggle_move()
+
+		if self.circuit_flag:
+			#Logic for circuit button presses
+			pass
 
 
 	def selector(self):
@@ -324,6 +411,22 @@ class Toolbar:
 			self.nodes_flag = False
 		else:
 			self.nodes_flag = True
+
+	def toggle_copy(self):
+		print("Toggle Copy")
+		
+		if self.copy_flag:
+			self.copy_flag = False
+		else:
+			self.copy_flag = True
+
+	def toggle_move(self):
+		print("Toggle Move")
+		
+		if self.move_flag:
+			self.move_flag = False
+		else:
+			self.move_flag = True
 
 
 		
