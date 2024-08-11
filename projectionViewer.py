@@ -11,7 +11,6 @@ from tkinter import filedialog
 from tkinter.colorchooser import askcolor
 from Functions.pointInTriangle import pointInTriangle
 from Classes.Face import Face
-import matplotlib.pyplot as plt
 from PIL import Image
 
 class ProjectionViewer:
